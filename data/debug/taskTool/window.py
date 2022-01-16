@@ -1,0 +1,118 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'window.ui'
+#
+# Created by: PyQt5 UI code generator 5.14.2
+#
+# WARNING! All changes made in this file will be lost!
+
+
+from PyQt5 import QtCore, QtGui, QtWidgets
+
+
+class Ui_MainWindow(object):
+    def setupUi(self, MainWindow):
+        MainWindow.setObjectName("MainWindow")
+        MainWindow.resize(200, 50)
+        MainWindow.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
+        self.centralwidget = QtWidgets.QWidget(MainWindow)
+        self.centralwidget.setContextMenuPolicy(QtCore.Qt.PreventContextMenu)
+        self.centralwidget.setStyleSheet("QWidget#centralwidget{background:#1D1D1D;}")
+        self.centralwidget.setObjectName("centralwidget")
+        self.gridLayout = QtWidgets.QGridLayout(self.centralwidget)
+        self.gridLayout.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout.setSpacing(0)
+        self.gridLayout.setObjectName("gridLayout")
+        self.widget_mem = QtWidgets.QWidget(self.centralwidget)
+        self.widget_mem.setObjectName("widget_mem")
+        self.gridLayout_5 = QtWidgets.QGridLayout(self.widget_mem)
+        self.gridLayout_5.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout_5.setSpacing(0)
+        self.gridLayout_5.setObjectName("gridLayout_5")
+        self.pushButton_mem = QtWidgets.QPushButton(self.widget_mem)
+        self.pushButton_mem.setEnabled(True)
+        self.pushButton_mem.setMinimumSize(QtCore.QSize(74, 0))
+        self.pushButton_mem.setMaximumSize(QtCore.QSize(74, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("微软雅黑")
+        self.pushButton_mem.setFont(font)
+        self.pushButton_mem.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
+        self.pushButton_mem.setStyleSheet("QPushButton{background:Transparent;color:white;text-align:left;padding:0}\n"
+"QPushButton:hover{background:Transparent;color:white;text-align:left;padding:0}")
+        self.pushButton_mem.setText("")
+        self.pushButton_mem.setObjectName("pushButton_mem")
+        self.gridLayout_5.addWidget(self.pushButton_mem, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.widget_mem, 1, 1, 1, 1)
+        self.widget_cpu = QtWidgets.QWidget(self.centralwidget)
+        self.widget_cpu.setEnabled(True)
+        self.widget_cpu.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
+        self.widget_cpu.setObjectName("widget_cpu")
+        self.gridLayout_4 = QtWidgets.QGridLayout(self.widget_cpu)
+        self.gridLayout_4.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout_4.setSpacing(0)
+        self.gridLayout_4.setObjectName("gridLayout_4")
+        self.pushButton_cpu = QtWidgets.QPushButton(self.widget_cpu)
+        self.pushButton_cpu.setEnabled(True)
+        self.pushButton_cpu.setMinimumSize(QtCore.QSize(74, 0))
+        self.pushButton_cpu.setMaximumSize(QtCore.QSize(74, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("微软雅黑")
+        self.pushButton_cpu.setFont(font)
+        self.pushButton_cpu.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
+        self.pushButton_cpu.setStyleSheet("QPushButton{background:Transparent;color:white;text-align:left;padding:0}\n"
+"QPushButton:hover{background:Transparent;color:white;text-align:left;padding:0}")
+        self.pushButton_cpu.setText("")
+        self.pushButton_cpu.setObjectName("pushButton_cpu")
+        self.gridLayout_4.addWidget(self.pushButton_cpu, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.widget_cpu, 1, 0, 1, 1)
+        self.widget_down = QtWidgets.QWidget(self.centralwidget)
+        self.widget_down.setObjectName("widget_down")
+        self.gridLayout_3 = QtWidgets.QGridLayout(self.widget_down)
+        self.gridLayout_3.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout_3.setSpacing(0)
+        self.gridLayout_3.setObjectName("gridLayout_3")
+        self.pushButton_down = QtWidgets.QPushButton(self.widget_down)
+        self.pushButton_down.setEnabled(True)
+        self.pushButton_down.setMinimumSize(QtCore.QSize(74, 0))
+        self.pushButton_down.setMaximumSize(QtCore.QSize(74, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("微软雅黑")
+        self.pushButton_down.setFont(font)
+        self.pushButton_down.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
+        self.pushButton_down.setStyleSheet("QPushButton{background:Transparent;color:white;text-align:left;padding:0}\n"
+"QPushButton:hover{background:Transparent;color:white;text-align:left;padding:0}")
+        self.pushButton_down.setText("")
+        self.pushButton_down.setObjectName("pushButton_down")
+        self.gridLayout_3.addWidget(self.pushButton_down, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.widget_down, 0, 1, 1, 1)
+        self.widget_up = QtWidgets.QWidget(self.centralwidget)
+        self.widget_up.setObjectName("widget_up")
+        self.gridLayout_2 = QtWidgets.QGridLayout(self.widget_up)
+        self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
+        self.gridLayout_2.setSpacing(0)
+        self.gridLayout_2.setObjectName("gridLayout_2")
+        self.pushButton_up = QtWidgets.QPushButton(self.widget_up)
+        self.pushButton_up.setEnabled(True)
+        self.pushButton_up.setMinimumSize(QtCore.QSize(74, 0))
+        self.pushButton_up.setMaximumSize(QtCore.QSize(74, 16777215))
+        font = QtGui.QFont()
+        font.setFamily("微软雅黑")
+        self.pushButton_up.setFont(font)
+        self.pushButton_up.setContextMenuPolicy(QtCore.Qt.DefaultContextMenu)
+        self.pushButton_up.setStyleSheet("QPushButton{background:Transparent;color:white;text-align:left;padding:0}\n"
+"QPushButton:hover{background:Transparent;color:white;text-align:left;padding:0}")
+        self.pushButton_up.setText("")
+        self.pushButton_up.setObjectName("pushButton_up")
+        self.gridLayout_2.addWidget(self.pushButton_up, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.widget_up, 0, 0, 1, 1)
+        MainWindow.setCentralWidget(self.centralwidget)
+
+        self.retranslateUi(MainWindow)
+        QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        MainWindow.setTabOrder(self.pushButton_up, self.pushButton_cpu)
+        MainWindow.setTabOrder(self.pushButton_cpu, self.pushButton_mem)
+        MainWindow.setTabOrder(self.pushButton_mem, self.pushButton_down)
+
+    def retranslateUi(self, MainWindow):
+        _translate = QtCore.QCoreApplication.translate
+        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
