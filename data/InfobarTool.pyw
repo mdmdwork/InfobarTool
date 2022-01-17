@@ -15,17 +15,19 @@ class InfobarTool(tkinter.Tk):
         super().__init__()
         self.ckjb_i = 1
         self.ckjb = 1
+        self.new_d1_Window_width = d1_Window_width
+        self.net_text_first = psutil.net_io_counters()
         self.var1 = IntVar(value=d1_bgtm_if)
-        self.var2 = IntVar(value=d1_price)
-        self.var3 = IntVar(value=d1_price_float)
-        self.var4 = IntVar(value=d1_net_if)
-        self.net1 = psutil.net_io_counters()
         self.select = IntVar(value=d1_select_if)
+
+        self.var_frm1 = IntVar(value=d1_frm1)
+        self.var_frm2 = IntVar(value=d1_frm2)
+        self.var_frm3 = IntVar(value=d1_frm3)
 
         self.title(version)
         # self.iconbitmap('logo.ico')  # 设置左上角图标，没有图片会报错
-        self.geometry("180x40-5000-5000")  # 例子：160x100+900+300，160x100为设置窗口尺寸，+900+300为设置窗口位置
-        # self.geometry("165x40+500+500")
+        self.geometry("-5000-5000")  # 例子：160x100+900+300，160x100为设置窗口尺寸，+900+300为设置窗口位置
+        # self.geometry("182x40+500+500")
         if d1_bgtm_if == 1:
             self.wm_attributes('-transparentcolor', d1_bg_color)  # 将d1_bg_color设置透明
         else:
@@ -36,20 +38,16 @@ class InfobarTool(tkinter.Tk):
         self.resizable(width=False, height=False)  # 给窗口设置横轴竖轴的可缩放性
         self.overrideredirect(True)  # 隐藏窗口边框和任务栏图标
         self.wm_attributes('-topmost', 1)  # 设置窗口置顶
-
         # self.attributes("-disabled", True)  # 可用"-toolwindow"（只显示关闭按钮）,"-fullscreen"（充满屏幕）,"-disabled"（不可点击）
 
-        self.frm1 = Frame(self, bg=d1_bg_color, padx=0, pady=0, borderwidth=0, width=0, height=0, cursor='heart')
-        # self.frm1.pack(side='left', expand=YES, fill=BOTH)
-        self.frm2 = Frame(self, bg=d1_bg_color, padx=0, pady=0, borderwidth=0, width=0, height=0, cursor='heart')
-        # self.frm2.pack(side='left', expand=YES, fill=BOTH)
-        self.frm3 = Frame(self, bg=d1_bg_color, padx=0, pady=0, borderwidth=0, width=0, height=0, cursor='heart')
-        # self.frm3.pack(side='left', expand=YES, fill=BOTH)
+        self.frm1 = Frame(self, bg=d1_bg_color, cursor='heart')
+        self.frm2 = Frame(self, bg=d1_bg_color, cursor='heart')
+        self.frm3 = Frame(self, bg=d1_bg_color, cursor='heart')
 
         self.l1 = Label(self.frm1, padx=0, pady=0, borderwidth=0, width=0, height=0, fg=d1_word_color, bg=d1_bg_color,
                         font=('等线', 10, 'bold'), text="虚拟币种类")
         self.l2 = Label(self.frm1, padx=0, pady=0, borderwidth=0, width=0, height=0, fg=d1_word_color, bg=d1_bg_color,
-                        font=('等线', 13, 'bold'), text="实时价格")
+                        font=('等线', 10, 'bold'), text="实时价格")
         self.l3 = Label(self.frm2, padx=0, pady=0, borderwidth=0, width=0, height=0, fg=d1_word_color, bg=d1_bg_color,
                         font=('等线', 10, 'bold'), text="24H高价")
         self.l4 = Label(self.frm2, padx=0, pady=0, borderwidth=0, width=0, height=0, fg=d1_word_color, bg=d1_bg_color,
@@ -65,65 +63,169 @@ class InfobarTool(tkinter.Tk):
         # label1.pack(side='top', expand='yes')
 
         self.bind("<Button-3>", self.showmenu)
-        self.d1_net_if()
         self.update_btcdata2()
-        self.mainpd()
+        self.net_if()
+        self.cpu_mem()
+        self.window_to_taskbar()
         self.windows2()
 
-    # tkinter显示逻辑
-    def mainpd(self):
-        global d1_Window_width, d1_net_if, b, d1_shiftx, d1_shiftx_new
+    # tkinter控件显示逻辑
+    def tk_show(self, function, text_v1, text_v2):
+        def frm_forget():
+            if self.var_frm1.get() == 0:
+                self.frm1.pack_forget()
+            if self.var_frm2.get() == 0:
+                self.frm2.pack_forget()
+            if self.var_frm3.get() == 0:
+                self.frm3.pack_forget()
 
-        def all_pack():
+        if self.var_frm1.get() == function:
             self.frm1.pack_forget()
             self.frm2.pack_forget()
             self.frm3.pack_forget()
+            self.frm1.pack(side='left', expand=YES, fill=BOTH)
+            self.frm2.pack(side='left', expand=YES, fill=BOTH)
+            self.frm3.pack(side='left', expand=YES, fill=BOTH)
+            frm_forget()
+            self.l1.config(text=text_v1)
+            self.l2.config(text=text_v2)
             self.l1.pack(expand=YES, fill=Y)
             self.l2.pack(expand=YES, fill=Y)
+        if self.var_frm2.get() == function:
+            self.frm1.pack_forget()
+            self.frm2.pack_forget()
+            self.frm3.pack_forget()
+            self.frm1.pack(side='left', expand=YES, fill=BOTH)
+            self.frm2.pack(side='left', expand=YES, fill=BOTH)
+            self.frm3.pack(side='left', expand=YES, fill=BOTH)
+            frm_forget()
+            self.l3.config(text=text_v1)
+            self.l4.config(text=text_v2)
             self.l3.pack(expand=YES, fill=Y)
             self.l4.pack(expand=YES, fill=Y)
+        if self.var_frm3.get() == function:
+            self.frm1.pack_forget()
+            self.frm2.pack_forget()
+            self.frm3.pack_forget()
+            self.frm1.pack(side='left', expand=YES, fill=BOTH)
+            self.frm2.pack(side='left', expand=YES, fill=BOTH)
+            self.frm3.pack(side='left', expand=YES, fill=BOTH)
+            frm_forget()
+            self.l5.config(text=text_v1)
+            self.l6.config(text=text_v2)
             self.l5.pack(expand=YES, fill=Y)
             self.l6.pack(expand=YES, fill=Y)
 
-        if [d1_price, d1_price_float, d1_net_if] == [0, 0, 1]:
-            all_pack()
-            new_d1_Window_width = 80
-            self.frm3.pack(side='left', expand=YES, fill=BOTH)
-        elif [d1_price, d1_price_float, d1_net_if] == [0, 1, 0]:
-            all_pack()
-            new_d1_Window_width = 80
-            self.frm2.pack(side='left', expand=YES, fill=BOTH)
-        elif [d1_price, d1_price_float, d1_net_if] == [1, 0, 0]:
-            all_pack()
-            new_d1_Window_width = 80
-            self.frm1.pack(side='left', expand=YES, fill=BOTH)
-        elif [d1_price, d1_price_float, d1_net_if] == [1, 1, 0]:
-            all_pack()
-            new_d1_Window_width = 130
-            self.frm1.pack(side='left', expand=YES, fill=BOTH)
-            self.frm2.pack(side='left', expand=YES, fill=BOTH)
-        elif [d1_price, d1_price_float, d1_net_if] == [0, 1, 1]:
-            all_pack()
-            new_d1_Window_width = 130
-            self.frm2.pack(side='left', expand=YES, fill=BOTH)
-            self.frm3.pack(side='left', expand=YES, fill=BOTH)
-        elif [d1_price, d1_price_float, d1_net_if] == [1, 0, 1]:
-            all_pack()
-            new_d1_Window_width = 130
-            self.frm1.pack(side='left', expand=YES, fill=BOTH)
-            self.frm3.pack(side='left', expand=YES, fill=BOTH)
-        elif [d1_price, d1_price_float, d1_net_if] == [1, 1, 1]:
-            all_pack()
-            new_d1_Window_width = 181
-            self.frm1.pack(side='left', expand=YES, fill=BOTH)
-            self.frm2.pack(side='left', expand=YES, fill=BOTH)
-            self.frm3.pack(side='left', expand=YES, fill=BOTH)
+    # 网速信息获取
+    def net_if(self):
+        if 3 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:  # 首先先判断是否需要显示网速
+            def formatnum(size):
+                ds = ['', 'k', 'm', 'g', 't']
+                for d in ds:
+                    if size < 1000:
+                        if d:
+                            return str(size) + d + "/s"
+                        else:
+                            return f'{round(size / 1024, 1)}k/s'
+                    size = round(size / 1024, 1)
+                return '0b/s'
+
+            net0 = self.net_text_first
+            net1 = psutil.net_io_counters()
+            net_sent = '⇡' + formatnum((net1.bytes_sent - net0.bytes_sent) * 1)
+            net_recv = '⇣' + formatnum((net1.bytes_recv - net0.bytes_recv) * 1)
+            self.net_text_first = psutil.net_io_counters()
+            self.tk_show(3, net_sent, net_recv)
         else:
-            d1_net_if = 1
-            new_d1_Window_width = 80
-            self.var4.set(1)
-            self.save()
-            messagebox.showinfo(version, "不支持功能全关，已自动帮你打开仅显示网速模式\n\n另外：若是因修改配置文件导致该情况，重启即可恢复正常")
+            pass
+        self.after(995, self.net_if)  # 考虑程序执行延迟采用995毫秒
+
+    # cpu和内存占用信息获取
+    def cpu_mem(self):
+        if 4 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
+            cpu = f"CPU{psutil.cpu_percent()}%"
+            mem = f"内存{psutil.virtual_memory().percent}%"
+            self.tk_show(4, cpu, mem)
+        self.after(995, self.cpu_mem)
+
+    @staticmethod
+    def update_btcdata():
+        url = 'https://www.usd-cny.com/data/b.js'
+        headers = {
+            "Connection": "close",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Edg/96.0.1054.62"
+        }
+        proxies = {'http': "http://127.0.0.1:10809",
+                   'https': "http://127.0.0.1:10809"}
+        s = requests.Session()
+        s.mount('http://', HTTPAdapter(max_retries=2))
+        s.mount('https://', HTTPAdapter(max_retries=2))  # 设置重试次数为2次
+
+        try:
+            response = s.get(url=url, headers=headers)
+            print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + ' 数据更新成功！')
+        except Exception:
+            response = s.get(url=url, headers=headers, proxies=proxies)
+            print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + ' 数据更新成功！使用v2ray代理端口')
+
+        # response = json.loads(response.text)
+        aa = response.text
+        # print(aa[0])
+        aa_list = aa.replace("\n", "").split(";")  # 将换行符号替换为空，并按；分割为列表
+        # print(aa_list[0])
+        return aa_list
+
+    def update_btcdata2(self):
+        global d1_select_if
+        if 1 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()] or \
+                2 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
+            try:
+                aa_list = self.update_btcdata()
+                if d1_select_if == 1:
+                    select_name = 'BTC'
+                    data_list = aa_list[0].replace("var hq_str_btc_btcbtcusd=", "").replace("\"", "").split(",")
+                    # print(data_list)
+                elif d1_select_if == 2:
+                    select_name = 'ETH'
+                    data_list = aa_list[2].replace("var hq_str_btc_btcethusd=", "").replace("\"", "").split(",")
+                else:
+                    select_name = '币种出错'
+                    data_list = []
+
+                buy_btc = "%.1f" % float(data_list[8])
+                high_btc = "%.0f" % float(data_list[6])
+                low_btc = "%.0f" % float(data_list[7])
+                base_btc = "%.1f" % float(data_list[5])
+
+                # 测试专用
+                # buy_btc = "%.1f" % float(45000)
+                # high_btc = "%.0f" % float(46000)
+                # low_btc = "%.0f" % float(45500)
+                # base_btc = "%.1f" % float(44000)
+
+                if buy_btc > base_btc:
+                    add_btc = "+%.1f%%" % (((float(buy_btc) - float(base_btc)) / float(base_btc)) * 100)
+                else:
+                    add_btc = "%.1f%%" % (((float(buy_btc) - float(base_btc)) / float(base_btc)) * 100)
+
+                if 1 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
+                    self.tk_show(1, (select_name + ' ' + add_btc), ('$' + buy_btc))
+                if 2 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
+                    self.tk_show(2, ('⇡' + high_btc), ('⇣' + low_btc))
+            except Exception as err1:
+                if 1 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
+                    self.tk_show(1, "无数据", "无数据")
+                if 2 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
+                    self.tk_show(2, "无数据", "无数据")
+                print(err1)
+        else:
+            print("单机模式，虚拟币数据已暂停获取")
+            pass
+        self.after(5000, self.update_btcdata2)  # 5秒钟执行一次该方法
+
+    # 将窗口放置在任务栏并监控任务栏变化
+    def window_to_taskbar(self):
+        global d1_Window_width, b, d1_shiftx, d1_shiftx_new
 
         def Refresh(zck):
             win32gui.MoveWindow(m_hmin, 0, 0, b[2] - b[0] - d1_Window_width - d1_shiftx, b[3] - b[1],
@@ -155,8 +257,8 @@ class InfobarTool(tkinter.Tk):
                 d1_shiftx = d1_shiftx_new
                 Refresh(self.ckjb)
 
-            elif d1_Window_width != new_d1_Window_width:
-                d1_Window_width = new_d1_Window_width
+            elif d1_Window_width != self.new_d1_Window_width:
+                d1_Window_width = self.new_d1_Window_width
                 Refresh(self.ckjb)
                 self.save()
 
@@ -165,105 +267,7 @@ class InfobarTool(tkinter.Tk):
 
         except Exception as err2:
             print("获取当前窗口句柄失败!错误类型：" + str(err2))
-        self.after(200, self.mainpd)
-
-    # 网速信息获取
-    def d1_net_if(self):
-        # print("网速显示" + str(d1_net_if))
-        if d1_net_if == 1:  # 首先先判断是否需要显示网速
-            def formatnum(size):
-                ds = ['', 'k', 'm', 'g', 't']
-                for d in ds:
-                    if size < 1000:
-                        if d:
-                            return str(size) + d + "/s"
-                        else:
-                            return f'{round(size / 1024, 1)}k/s'
-                    size = round(size / 1024, 1)
-                return '0b/s'
-
-            net0 = self.net1
-            net1 = psutil.net_io_counters()
-            self.l5.config(text='⇡' + formatnum((net1.bytes_sent - net0.bytes_sent) * 1))
-            self.l6.config(text='⇣' + formatnum((net1.bytes_recv - net0.bytes_recv) * 1))
-            self.net1 = psutil.net_io_counters()
-        else:
-            pass
-        self.after(995, self.d1_net_if)  # 考虑程序执行延迟采用995毫秒
-
-    @staticmethod
-    def update_btcdata():
-        url = 'https://www.usd-cny.com/data/b.js'
-        headers = {
-            "Connection": "close",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Edg/96.0.1054.62"
-        }
-        proxies = {'http': "http://127.0.0.1:10809",
-                   'https': "http://127.0.0.1:10809"}
-        s = requests.Session()
-        s.mount('http://', HTTPAdapter(max_retries=2))
-        s.mount('https://', HTTPAdapter(max_retries=2))  # 设置重试次数为2次
-
-        try:
-            response = s.get(url=url, headers=headers)
-            print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + ' 数据更新成功！')
-        except Exception:
-            response = s.get(url=url, headers=headers, proxies=proxies)
-            print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + ' 数据更新成功！使用v2ray代理端口')
-
-        # response = json.loads(response.text)
-        aa = response.text
-        # print(aa[0])
-        aa_list = aa.replace("\n", "").split(";")  # 将换行符号替换为空，并按；分割为列表
-        # print(aa_list[0])
-        return aa_list
-
-    def update_btcdata2(self):
-        global d1_select_if
-        if d1_price == 1 or d1_price_float == 1:
-            try:
-                aa_list = self.update_btcdata()
-                if d1_select_if == 1:
-                    select_name = 'BTC'
-                    data_list = aa_list[0].replace("var hq_str_btc_btcbtcusd=", "").replace("\"", "").split(",")
-                    # print(data_list)
-                elif d1_select_if == 2:
-                    select_name = 'ETH'
-                    data_list = aa_list[2].replace("var hq_str_btc_btcethusd=", "").replace("\"", "").split(",")
-                else:
-                    select_name = '币种出错'
-                    data_list = []
-
-                buy_btc = "%.1f" % float(data_list[8])
-                high_btc = "%.0f" % float(data_list[6])
-                low_btc = "%.0f" % float(data_list[7])
-                base_btc = "%.1f" % float(data_list[5])
-                if buy_btc > base_btc:
-                    add_btc = "+%.1f%%" % (((float(buy_btc) - float(base_btc)) / float(base_btc)) * 100)
-                else:
-                    add_btc = "%.1f%%" % (((float(buy_btc) - float(base_btc)) / float(base_btc)) * 100)
-
-                if d1_price == 1:
-                    self.l1.config(text=select_name + ' ' + add_btc)
-                    self.l2.config(text='$' + buy_btc)
-                else:
-                    pass
-
-                if d1_price_float == 1:
-                    self.l3.config(text='⇡' + high_btc)
-                    self.l4.config(text='⇣' + low_btc)
-                else:
-                    pass
-            except Exception as err1:
-                self.l1.config(text='无数据', font=('等线', 10, 'bold'))
-                self.l2.config(text='无数据', font=('等线', 10, 'bold'))
-                self.l3.config(text='无数据', font=('等线', 10, 'bold'))
-                self.l4.config(text='无数据', font=('等线', 10, 'bold'))
-                print(err1)
-        else:
-            print("单网速模式，虚拟币数据已暂停获取")
-            pass
-        self.after(5000, self.update_btcdata2)  # 5秒钟执行一次该方法
+        self.after(200, self.window_to_taskbar)
 
     # 右键菜单设置
     def showmenu(self, event):
@@ -274,6 +278,7 @@ class InfobarTool(tkinter.Tk):
         fmenu2 = Menu(self, tearoff=0)
         fmenu2.add_cascade(label="白底黑字", command=restore_b, background='#FFFFFF', foreground='#383838')
         fmenu2.add_cascade(label="黑底白字", command=restore_w, background='#383838', foreground='#FFFFFF')
+
         fmenu3 = Menu(self, tearoff=0)
         select_list = [
             ('BTC', 1),
@@ -281,15 +286,33 @@ class InfobarTool(tkinter.Tk):
         ]
         for s_l, num in select_list:
             fmenu3.add_radiobutton(label=s_l, command=self.sz_pd, variable=self.select, value=num)
+
         fmenu4 = Menu(self, tearoff=0)
-        fmenu4.add_checkbutton(label="实时价格", command=self.sz_pd, variable=self.var2)
-        fmenu4.add_checkbutton(label="24H峰值", command=self.sz_pd, variable=self.var3)
-        fmenu4.add_checkbutton(label="网速显示", command=self.sz_pd, variable=self.var4)
+        fmenu5 = Menu(self, tearoff=0)
+        fmenu6 = Menu(self, tearoff=0)
+        select_list = [
+            ('移除', 0),
+            ('实时价格', 1),
+            ('24H峰值', 2),
+            ('网速显示', 3),
+            ('CPU和内存占用', 4),
+        ]
+        for s_l, num in select_list:
+            fmenu4.add_radiobutton(label=s_l, command=self.sz_pd, variable=self.var_frm1, value=num)
+            fmenu5.add_radiobutton(label=s_l, command=self.sz_pd, variable=self.var_frm2, value=num)
+            fmenu6.add_radiobutton(label=s_l, command=self.sz_pd, variable=self.var_frm3, value=num)
+
+        # fmenu4 = Menu(self, tearoff=0)
+        # fmenu4.add_checkbutton(label="实时价格", command=self.sz_pd, variable=self.var2)
+        # fmenu4.add_checkbutton(label="24H峰值", command=self.sz_pd, variable=self.var3)
+        # fmenu4.add_checkbutton(label="网速显示", command=self.sz_pd, variable=self.var4)
 
         menubar = Menu(self, tearoff=0)  # tearoff=0表示取消菜单独立，无横线
         menubar.add_cascade(label="币种选择", menu=fmenu3)
         menubar.add_cascade(label="配色修改", menu=fmenu1)
-        menubar.add_cascade(label="选择显示信息", menu=fmenu4)
+        menubar.add_cascade(label="第一功能区", menu=fmenu4)
+        menubar.add_cascade(label="第二功能区", menu=fmenu5)
+        menubar.add_cascade(label="第三功能区", menu=fmenu6)
         menubar.add_cascade(label="移动此工具位置", command=self.move_position)
         menubar.add_separator()  # 添加菜单横线
         menubar.add_cascade(label="恢复默认", menu=fmenu2)
@@ -301,11 +324,33 @@ class InfobarTool(tkinter.Tk):
 
     # 是否选中判断
     def sz_pd(self):
-        global d1_select_if, d1_price, d1_price_float, d1_net_if
+        global d1_select_if, d1_frm1, d1_frm2, d1_frm3
+        l_frm1 = self.var_frm1.get()
+        l_frm2 = self.var_frm2.get()
+        l_frm3 = self.var_frm3.get()
+        list_frm = [l_frm1, l_frm2, l_frm3]
+        if l_frm1 == 0:
+            self.frm1.pack_forget()
+        if l_frm2 == 0:
+            self.frm2.pack_forget()
+        if l_frm3 == 0:
+            self.frm3.pack_forget()
+
+        if list_frm.count(0) == 3:
+            self.var_frm3.set(3)
+            self.new_d1_Window_width = 80
+            messagebox.showinfo(version, "不支持功能全关，已自动帮你打开仅显示网速模式\n\n另外：若是因修改配置文件导致该情况，重启即可恢复正常")
+        if list_frm.count(0) == 2:
+            self.new_d1_Window_width = 80
+        if list_frm.count(0) == 1:
+            self.new_d1_Window_width = 130
+        if list_frm.count(0) == 0:
+            self.new_d1_Window_width = 180
+
         d1_select_if = self.select.get()
-        d1_price = self.var2.get()
-        d1_price_float = self.var3.get()
-        d1_net_if = self.var4.get()
+        d1_frm1 = l_frm1
+        d1_frm2 = l_frm2
+        d1_frm3 = l_frm3
         self.save()
 
     # 透明/有色背景判断函数
@@ -389,8 +434,9 @@ class InfobarTool(tkinter.Tk):
         out_file = open("%s.ini" % version, 'r+', encoding='utf-8')
         index = 0
 
-        dict_line = {4: d1_shiftx, 7: d1_bg_color, 10: d1_word_color, 13: d1_bgtm_if, 16: d1_net_if, 19: d1_select_if, 22: d1_Window_width,
-                     25: d1_price, 28: d1_price_float}
+        dict_line = {4: d1_shiftx, 7: d1_bg_color, 10: d1_word_color, 13: d1_bgtm_if, 16: d1_frm3, 19: d1_select_if,
+                     22: d1_Window_width,
+                     25: d1_frm1, 28: d1_frm2}
 
         for line in in_file:
             index = index + 1
@@ -455,7 +501,7 @@ class InfobarTool(tkinter.Tk):
         self.after(60000, self.windows2)
 
 
-# 退出函数，还原原来的状态栏窗口
+# 退出函数，还原之前的状态栏窗口大小
 def app_quit():
     win32gui.MoveWindow(win32gui.FindWindowEx(win32gui.FindWindowEx(win32gui.FindWindow(
         "Shell_TrayWnd", None), 0, "ReBarWindow32", None), 0, "MSTaskSwWClass", None),
@@ -501,20 +547,20 @@ def restore_w():
            '##透明背景##d1_bgtm_if = ',
            '1',
            '-----------------------------',
-           '##网速显示##d1_net_if = ',
-           '1',
+           '##第三功能区##d1_frm3 = ',
+           '3',
            '-----------------------------',
            '##币种选择##d1_select_if =',
            '1',
            '-----------------------------',
            '##显示窗口宽度##d1_Window_width =',
-           '181',
+           '180',
            '-----------------------------',
-           '##实时价格##d1_price =',
+           '##第一功能区##d1_frm1 =',
            '1',
            '-----------------------------',
-           '##24H峰值##d1_price_float =',
-           '1',
+           '##第二功能区##d1_frm2 =',
+           '4',
            '-----------------------------'
            ]
     for line in r_w:
@@ -575,7 +621,7 @@ def judge_process(processname):
 if __name__ == '__main__':
     judge_process("InfobarTool.exe")
     remove_line = [4, 7, 10, 13, 16, 19, 22, 25, 28]
-    version = "InfobarTool_v1.0.0"
+    version = "InfobarTool_v1.0.1"
     b = win32gui.GetWindowRect(
         win32gui.FindWindowEx(
             win32gui.FindWindow("Shell_TrayWnd", None), 0, "ReBarWindow32", None))
@@ -590,11 +636,11 @@ if __name__ == '__main__':
         d1_bg_color = linecache.getline("%s.ini" % version, remove_line[1]).replace(" ", "").strip('\n')
         d1_word_color = linecache.getline("%s.ini" % version, remove_line[2]).replace(" ", "").strip('\n')
         d1_bgtm_if = int(linecache.getline("%s.ini" % version, remove_line[3]).replace(" ", "").strip('\n'))
-        d1_net_if = int(linecache.getline("%s.ini" % version, remove_line[4]).replace(" ", "").strip('\n'))
+        d1_frm3 = int(linecache.getline("%s.ini" % version, remove_line[4]).replace(" ", "").strip('\n'))
         d1_select_if = int(linecache.getline("%s.ini" % version, remove_line[5]).replace(" ", "").strip('\n'))
         d1_Window_width = int(linecache.getline("%s.ini" % version, remove_line[6]).replace(" ", "").strip('\n'))
-        d1_price = int(linecache.getline("%s.ini" % version, remove_line[7]).replace(" ", "").strip('\n'))
-        d1_price_float = int(linecache.getline("%s.ini" % version, remove_line[8]).replace(" ", "").strip('\n'))
+        d1_frm1 = int(linecache.getline("%s.ini" % version, remove_line[7]).replace(" ", "").strip('\n'))
+        d1_frm2 = int(linecache.getline("%s.ini" % version, remove_line[8]).replace(" ", "").strip('\n'))
         d1_shiftx_new = d1_shiftx
 
     except Exception as err:
@@ -604,11 +650,11 @@ if __name__ == '__main__':
         d1_bg_color = linecache.getline("%s.ini" % version, remove_line[1]).replace(" ", "").strip('\n')
         d1_word_color = linecache.getline("%s.ini" % version, remove_line[2]).replace(" ", "").strip('\n')
         d1_bgtm_if = int(linecache.getline("%s.ini" % version, remove_line[3]).replace(" ", "").strip('\n'))
-        d1_net_if = int(linecache.getline("%s.ini" % version, remove_line[4]).replace(" ", "").strip('\n'))
+        d1_frm3 = int(linecache.getline("%s.ini" % version, remove_line[4]).replace(" ", "").strip('\n'))
         d1_select_if = int(linecache.getline("%s.ini" % version, remove_line[5]).replace(" ", "").strip('\n'))
         d1_Window_width = int(linecache.getline("%s.ini" % version, remove_line[6]).replace(" ", "").strip('\n'))
-        d1_price = int(linecache.getline("%s.ini" % version, remove_line[7]).replace(" ", "").strip('\n'))
-        d1_price_float = int(linecache.getline("%s.ini" % version, remove_line[8]).replace(" ", "").strip('\n'))
+        d1_frm1 = int(linecache.getline("%s.ini" % version, remove_line[7]).replace(" ", "").strip('\n'))
+        d1_frm2 = int(linecache.getline("%s.ini" % version, remove_line[8]).replace(" ", "").strip('\n'))
         d1_shiftx_new = d1_shiftx
 
     app = InfobarTool()
