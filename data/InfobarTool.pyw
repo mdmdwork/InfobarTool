@@ -1,14 +1,13 @@
-import tkinter.colorchooser
-import tkinter.simpledialog
-from tkinter import *
-from tkinter import messagebox
-from psutil import net_io_counters
-from requests.adapters import HTTPAdapter
-import tkinter
-import requests
-import win32gui
 import linecache
 import time
+import tkinter
+from tkinter import *
+from tkinter import messagebox, colorchooser, simpledialog
+import psutil
+import requests
+import win32gui
+import os
+from requests.adapters import HTTPAdapter
 
 
 class InfobarTool(tkinter.Tk):
@@ -20,7 +19,7 @@ class InfobarTool(tkinter.Tk):
         self.var2 = IntVar(value=d1_ssjg)
         self.var3 = IntVar(value=d1_24hfz)
         self.var4 = IntVar(value=netpd)
-        self.net1 = net_io_counters()
+        self.net1 = psutil.net_io_counters()
         self.select = IntVar(value=select_pd)
 
         self.title(version)
@@ -137,7 +136,7 @@ class InfobarTool(tkinter.Tk):
             return 0
 
         try:
-            # # 将窗体放置于状态栏
+            #  将窗体放置于状态栏
             m_htaskbar = win32gui.FindWindow("Shell_TrayWnd", None)
             m_hbar = win32gui.FindWindowEx(m_htaskbar, 0, "ReBarWindow32", None)
             m_hmin = win32gui.FindWindowEx(m_hbar, 0, "MSTaskSwWClass", None)
@@ -184,10 +183,10 @@ class InfobarTool(tkinter.Tk):
                 return '0b/s'
 
             net0 = self.net1
-            net1 = net_io_counters()
+            net1 = psutil.net_io_counters()
             self.l5.config(text='⇡' + formatnum((net1.bytes_sent - net0.bytes_sent) * 1))
             self.l6.config(text='⇣' + formatnum((net1.bytes_recv - net0.bytes_recv) * 1))
-            self.net1 = net_io_counters()
+            self.net1 = psutil.net_io_counters()
         else:
             pass
         self.after(995, self.netpd)  # 考虑程序执行延迟采用995毫秒
@@ -246,7 +245,7 @@ class InfobarTool(tkinter.Tk):
 
                 if d1_ssjg == 1:
                     self.l1.config(text=select_name + ' ' + add_btc)
-                    self.l2.config(text='$'+buy_btc)
+                    self.l2.config(text='$' + buy_btc)
                 else:
                     pass
 
@@ -293,18 +292,12 @@ class InfobarTool(tkinter.Tk):
         menubar.add_cascade(label="选择显示信息", menu=fmenu4)
         menubar.add_cascade(label="移动此工具位置", command=self.move_position)
         menubar.add_separator()  # 添加菜单横线
-        # menubar.add_cascade(label="设置", command=self.setting)
         menubar.add_cascade(label="恢复默认", menu=fmenu2)
         menubar.add_cascade(label="程序说明", command=self.about)
-        menubar.add_cascade(label="关闭程序", command=self.quit, background='#C8C8C8')
+        menubar.add_cascade(label="关闭程序", command=app_quit, background='#C8C8C8')
 
-        menubar.post(event.x_root-65, event.y_root-30)
+        menubar.post(event.x_root - 65, event.y_root - 30)
         print('右键菜单点击')
-
-    # 设置菜单函数
-    # @staticmethod
-    # def setting():
-    #     messagebox.showinfo("MD野生科技", "开发中")
 
     # 是否选中判断
     def sz_pd(self):
@@ -332,7 +325,7 @@ class InfobarTool(tkinter.Tk):
     # 字体颜色自定义函数
     def word_color_diy(self):
         global word_color
-        color = tkinter.colorchooser.askcolor()
+        color = colorchooser.askcolor()
         if color != (None, None):
             word_color = str(color)[-9:-2]
 
@@ -347,7 +340,7 @@ class InfobarTool(tkinter.Tk):
     # 背景颜色自定义函数
     def bg_color_diy(self):
         global bg_color, bgpd
-        color = tkinter.colorchooser.askcolor()
+        color = colorchooser.askcolor()
         # print(str(color)[-9:-2])
         if color != (None, None):
             bg_color = str(color)[-9:-2]
@@ -462,6 +455,14 @@ class InfobarTool(tkinter.Tk):
         self.after(60000, self.windows2)
 
 
+# 退出函数，还原原来的状态栏窗口
+def app_quit():
+    win32gui.MoveWindow(win32gui.FindWindowEx(win32gui.FindWindowEx(win32gui.FindWindow(
+        "Shell_TrayWnd", None), 0, "ReBarWindow32", None), 0, "MSTaskSwWClass", None),
+        0, 0, b[2] - b[0] - shiftx, b[3] - b[1], True)  # 还原任务栏
+    quit()
+
+
 # 白底黑字模式函数
 def restore_b():
     # dict_line = {7: '#d5d5d5', 10: '#2b2b2b'}
@@ -543,8 +544,8 @@ def zcm():
         root.geometry(size_xy)
         root.update()  # 窗体居中
 
-        result1 = tkinter.simpledialog.askstring(title=version, prompt='获取此软件更新请关注微信公众号：MD野生科技\n\n'
-                                                                       '请输入验证口令：', initialvalue='关注微信公众号可永久获得注册码')
+        result1 = simpledialog.askstring(title=version, prompt='获取此软件更新请关注微信公众号：MD野生科技\n\n'
+                                                               '请输入验证口令：', initialvalue='关注微信公众号可永久获得注册码')
         result = str(result1)
 
         if result != code_jm2:
@@ -562,6 +563,7 @@ def zcm():
 
 
 if __name__ == '__main__':
+    result = os.popen("taskkill /f /im InfobarTool.exe")  # 结束已运行的程序
     remove_line = [4, 7, 10, 13, 16, 19, 22, 25, 28]
     version = "InfobarTool_v1.0.0"
     b = win32gui.GetWindowRect(
