@@ -15,22 +15,22 @@ class InfobarTool(tkinter.Tk):
         super().__init__()
         self.ckjb_i = 1
         self.ckjb = 1
-        self.var1 = IntVar(value=bgpd)
-        self.var2 = IntVar(value=d1_ssjg)
-        self.var3 = IntVar(value=d1_24hfz)
-        self.var4 = IntVar(value=netpd)
+        self.var1 = IntVar(value=d1_bgtm_if)
+        self.var2 = IntVar(value=d1_price)
+        self.var3 = IntVar(value=d1_price_float)
+        self.var4 = IntVar(value=d1_net_if)
         self.net1 = psutil.net_io_counters()
-        self.select = IntVar(value=select_pd)
+        self.select = IntVar(value=d1_select_if)
 
         self.title(version)
         # self.iconbitmap('logo.ico')  # 设置左上角图标，没有图片会报错
         self.geometry("180x40-5000-5000")  # 例子：160x100+900+300，160x100为设置窗口尺寸，+900+300为设置窗口位置
         # self.geometry("165x40+500+500")
-        if bgpd == 1:
-            self.wm_attributes('-transparentcolor', bg_color)  # 将bg_color设置透明
+        if d1_bgtm_if == 1:
+            self.wm_attributes('-transparentcolor', d1_bg_color)  # 将d1_bg_color设置透明
         else:
             self.wm_attributes('-transparentcolor', '#796969')  # 将#796969色设置透明
-        self.configure(bg=bg_color)  # 设置窗体背景颜色
+        self.configure(bg=d1_bg_color)  # 设置窗体背景颜色
         # self.attributes('-alpha', 0.1)  # 设置窗体和控件透明度
 
         self.resizable(width=False, height=False)  # 给窗口设置横轴竖轴的可缩放性
@@ -39,24 +39,24 @@ class InfobarTool(tkinter.Tk):
 
         # self.attributes("-disabled", True)  # 可用"-toolwindow"（只显示关闭按钮）,"-fullscreen"（充满屏幕）,"-disabled"（不可点击）
 
-        self.frm1 = Frame(self, bg=bg_color, padx=0, pady=0, borderwidth=0, width=0, height=0, cursor='heart')
+        self.frm1 = Frame(self, bg=d1_bg_color, padx=0, pady=0, borderwidth=0, width=0, height=0, cursor='heart')
         # self.frm1.pack(side='left', expand=YES, fill=BOTH)
-        self.frm2 = Frame(self, bg=bg_color, padx=0, pady=0, borderwidth=0, width=0, height=0, cursor='heart')
+        self.frm2 = Frame(self, bg=d1_bg_color, padx=0, pady=0, borderwidth=0, width=0, height=0, cursor='heart')
         # self.frm2.pack(side='left', expand=YES, fill=BOTH)
-        self.frm3 = Frame(self, bg=bg_color, padx=0, pady=0, borderwidth=0, width=0, height=0, cursor='heart')
+        self.frm3 = Frame(self, bg=d1_bg_color, padx=0, pady=0, borderwidth=0, width=0, height=0, cursor='heart')
         # self.frm3.pack(side='left', expand=YES, fill=BOTH)
 
-        self.l1 = Label(self.frm1, padx=0, pady=0, borderwidth=0, width=0, height=0, fg=word_color, bg=bg_color,
+        self.l1 = Label(self.frm1, padx=0, pady=0, borderwidth=0, width=0, height=0, fg=d1_word_color, bg=d1_bg_color,
                         font=('等线', 10, 'bold'), text="虚拟币种类")
-        self.l2 = Label(self.frm1, padx=0, pady=0, borderwidth=0, width=0, height=0, fg=word_color, bg=bg_color,
+        self.l2 = Label(self.frm1, padx=0, pady=0, borderwidth=0, width=0, height=0, fg=d1_word_color, bg=d1_bg_color,
                         font=('等线', 13, 'bold'), text="实时价格")
-        self.l3 = Label(self.frm2, padx=0, pady=0, borderwidth=0, width=0, height=0, fg=word_color, bg=bg_color,
+        self.l3 = Label(self.frm2, padx=0, pady=0, borderwidth=0, width=0, height=0, fg=d1_word_color, bg=d1_bg_color,
                         font=('等线', 10, 'bold'), text="24H高价")
-        self.l4 = Label(self.frm2, padx=0, pady=0, borderwidth=0, width=0, height=0, fg=word_color, bg=bg_color,
+        self.l4 = Label(self.frm2, padx=0, pady=0, borderwidth=0, width=0, height=0, fg=d1_word_color, bg=d1_bg_color,
                         font=('等线', 10, 'bold'), text="24H低价")
-        self.l5 = Label(self.frm3, padx=0, pady=0, borderwidth=0, width=0, height=0, fg=word_color, bg=bg_color,
+        self.l5 = Label(self.frm3, padx=0, pady=0, borderwidth=0, width=0, height=0, fg=d1_word_color, bg=d1_bg_color,
                         font=('等线', 10, 'bold'), text="上传速度")
-        self.l6 = Label(self.frm3, padx=0, pady=0, borderwidth=0, width=0, height=0, fg=word_color, bg=bg_color,
+        self.l6 = Label(self.frm3, padx=0, pady=0, borderwidth=0, width=0, height=0, fg=d1_word_color, bg=d1_bg_color,
                         font=('等线', 10, 'bold'), text="下载速度")
 
         # 插入图片示例
@@ -65,14 +65,14 @@ class InfobarTool(tkinter.Tk):
         # label1.pack(side='top', expand='yes')
 
         self.bind("<Button-3>", self.showmenu)
-        self.netpd()
+        self.d1_net_if()
         self.update_btcdata2()
         self.mainpd()
         self.windows2()
 
     # tkinter显示逻辑
     def mainpd(self):
-        global d1_ckkd, netpd, b, shiftx, shiftx_new
+        global d1_Window_width, d1_net_if, b, d1_shiftx, d1_shiftx_new
 
         def all_pack():
             self.frm1.pack_forget()
@@ -85,53 +85,53 @@ class InfobarTool(tkinter.Tk):
             self.l5.pack(expand=YES, fill=Y)
             self.l6.pack(expand=YES, fill=Y)
 
-        if [d1_ssjg, d1_24hfz, netpd] == [0, 0, 1]:
+        if [d1_price, d1_price_float, d1_net_if] == [0, 0, 1]:
             all_pack()
-            new_d1_ckkd = 80
+            new_d1_Window_width = 80
             self.frm3.pack(side='left', expand=YES, fill=BOTH)
-        elif [d1_ssjg, d1_24hfz, netpd] == [0, 1, 0]:
+        elif [d1_price, d1_price_float, d1_net_if] == [0, 1, 0]:
             all_pack()
-            new_d1_ckkd = 80
+            new_d1_Window_width = 80
             self.frm2.pack(side='left', expand=YES, fill=BOTH)
-        elif [d1_ssjg, d1_24hfz, netpd] == [1, 0, 0]:
+        elif [d1_price, d1_price_float, d1_net_if] == [1, 0, 0]:
             all_pack()
-            new_d1_ckkd = 80
+            new_d1_Window_width = 80
             self.frm1.pack(side='left', expand=YES, fill=BOTH)
-        elif [d1_ssjg, d1_24hfz, netpd] == [1, 1, 0]:
+        elif [d1_price, d1_price_float, d1_net_if] == [1, 1, 0]:
             all_pack()
-            new_d1_ckkd = 130
+            new_d1_Window_width = 130
             self.frm1.pack(side='left', expand=YES, fill=BOTH)
             self.frm2.pack(side='left', expand=YES, fill=BOTH)
-        elif [d1_ssjg, d1_24hfz, netpd] == [0, 1, 1]:
+        elif [d1_price, d1_price_float, d1_net_if] == [0, 1, 1]:
             all_pack()
-            new_d1_ckkd = 130
+            new_d1_Window_width = 130
             self.frm2.pack(side='left', expand=YES, fill=BOTH)
             self.frm3.pack(side='left', expand=YES, fill=BOTH)
-        elif [d1_ssjg, d1_24hfz, netpd] == [1, 0, 1]:
+        elif [d1_price, d1_price_float, d1_net_if] == [1, 0, 1]:
             all_pack()
-            new_d1_ckkd = 130
+            new_d1_Window_width = 130
             self.frm1.pack(side='left', expand=YES, fill=BOTH)
             self.frm3.pack(side='left', expand=YES, fill=BOTH)
-        elif [d1_ssjg, d1_24hfz, netpd] == [1, 1, 1]:
+        elif [d1_price, d1_price_float, d1_net_if] == [1, 1, 1]:
             all_pack()
-            new_d1_ckkd = 181
+            new_d1_Window_width = 181
             self.frm1.pack(side='left', expand=YES, fill=BOTH)
             self.frm2.pack(side='left', expand=YES, fill=BOTH)
             self.frm3.pack(side='left', expand=YES, fill=BOTH)
         else:
-            netpd = 1
-            new_d1_ckkd = 80
+            d1_net_if = 1
+            new_d1_Window_width = 80
             self.var4.set(1)
             self.save()
             messagebox.showinfo(version, "不支持功能全关，已自动帮你打开仅显示网速模式\n\n另外：若是因修改配置文件导致该情况，重启即可恢复正常")
 
         def Refresh(zck):
-            win32gui.MoveWindow(m_hmin, 0, 0, b[2] - b[0] - d1_ckkd - shiftx, b[3] - b[1],
+            win32gui.MoveWindow(m_hmin, 0, 0, b[2] - b[0] - d1_Window_width - d1_shiftx, b[3] - b[1],
                                 True)  # 将MSTaskSwWClass缩小[x位置，y位置，宽，高]，预留窗口位置
             win32gui.SetParent(zck, m_hbar)  # 设置任务栏m_hBar为此窗口的父窗口
-            appx = str(b[2] - b[0] - d1_ckkd - shiftx)
+            appx = str(b[2] - b[0] - d1_Window_width - d1_shiftx)
             widthy = b[3] - b[1]  # 插入窗口的高
-            app.geometry(str(d1_ckkd) + 'x' + str(widthy) + '+' + appx + '+0')
+            app.geometry(str(d1_Window_width) + 'x' + str(widthy) + '+' + appx + '+0')
             print('窗口移动成功')
             return 0
 
@@ -151,12 +151,12 @@ class InfobarTool(tkinter.Tk):
                 b = c
                 Refresh(self.ckjb)
 
-            elif shiftx != shiftx_new:
-                shiftx = shiftx_new
+            elif d1_shiftx != d1_shiftx_new:
+                d1_shiftx = d1_shiftx_new
                 Refresh(self.ckjb)
 
-            elif d1_ckkd != new_d1_ckkd:
-                d1_ckkd = new_d1_ckkd
+            elif d1_Window_width != new_d1_Window_width:
+                d1_Window_width = new_d1_Window_width
                 Refresh(self.ckjb)
                 self.save()
 
@@ -168,9 +168,9 @@ class InfobarTool(tkinter.Tk):
         self.after(200, self.mainpd)
 
     # 网速信息获取
-    def netpd(self):
-        # print("网速显示" + str(netpd))
-        if netpd == 1:  # 首先先判断是否需要显示网速
+    def d1_net_if(self):
+        # print("网速显示" + str(d1_net_if))
+        if d1_net_if == 1:  # 首先先判断是否需要显示网速
             def formatnum(size):
                 ds = ['', 'k', 'm', 'g', 't']
                 for d in ds:
@@ -189,7 +189,7 @@ class InfobarTool(tkinter.Tk):
             self.net1 = psutil.net_io_counters()
         else:
             pass
-        self.after(995, self.netpd)  # 考虑程序执行延迟采用995毫秒
+        self.after(995, self.d1_net_if)  # 考虑程序执行延迟采用995毫秒
 
     @staticmethod
     def update_btcdata():
@@ -219,15 +219,15 @@ class InfobarTool(tkinter.Tk):
         return aa_list
 
     def update_btcdata2(self):
-        global select_pd
-        if d1_ssjg == 1 or d1_24hfz == 1:
+        global d1_select_if
+        if d1_price == 1 or d1_price_float == 1:
             try:
                 aa_list = self.update_btcdata()
-                if select_pd == 1:
+                if d1_select_if == 1:
                     select_name = 'BTC'
                     data_list = aa_list[0].replace("var hq_str_btc_btcbtcusd=", "").replace("\"", "").split(",")
                     # print(data_list)
-                elif select_pd == 2:
+                elif d1_select_if == 2:
                     select_name = 'ETH'
                     data_list = aa_list[2].replace("var hq_str_btc_btcethusd=", "").replace("\"", "").split(",")
                 else:
@@ -243,13 +243,13 @@ class InfobarTool(tkinter.Tk):
                 else:
                     add_btc = "%.1f%%" % (((float(buy_btc) - float(base_btc)) / float(base_btc)) * 100)
 
-                if d1_ssjg == 1:
+                if d1_price == 1:
                     self.l1.config(text=select_name + ' ' + add_btc)
                     self.l2.config(text='$' + buy_btc)
                 else:
                     pass
 
-                if d1_24hfz == 1:
+                if d1_price_float == 1:
                     self.l3.config(text='⇡' + high_btc)
                     self.l4.config(text='⇣' + low_btc)
                 else:
@@ -268,9 +268,9 @@ class InfobarTool(tkinter.Tk):
     # 右键菜单设置
     def showmenu(self, event):
         fmenu1 = Menu(self, tearoff=0)
-        fmenu1.add_cascade(label="选择字体颜色", command=self.word_color_diy)
-        fmenu1.add_cascade(label="选择背景颜色", command=self.bg_color_diy)
-        fmenu1.add_checkbutton(label="透明背景", command=self.bgpd_def, variable=self.var1)
+        fmenu1.add_cascade(label="选择字体颜色", command=self.d1_word_color_diy)
+        fmenu1.add_cascade(label="选择背景颜色", command=self.d1_bg_color_diy)
+        fmenu1.add_checkbutton(label="透明背景", command=self.d1_bgtm_if_def, variable=self.var1)
         fmenu2 = Menu(self, tearoff=0)
         fmenu2.add_cascade(label="白底黑字", command=restore_b, background='#FFFFFF', foreground='#383838')
         fmenu2.add_cascade(label="黑底白字", command=restore_w, background='#383838', foreground='#FFFFFF')
@@ -301,74 +301,74 @@ class InfobarTool(tkinter.Tk):
 
     # 是否选中判断
     def sz_pd(self):
-        global select_pd, d1_ssjg, d1_24hfz, netpd
-        select_pd = self.select.get()
-        d1_ssjg = self.var2.get()
-        d1_24hfz = self.var3.get()
-        netpd = self.var4.get()
+        global d1_select_if, d1_price, d1_price_float, d1_net_if
+        d1_select_if = self.select.get()
+        d1_price = self.var2.get()
+        d1_price_float = self.var3.get()
+        d1_net_if = self.var4.get()
         self.save()
 
     # 透明/有色背景判断函数
-    def bgpd_def(self):
-        global bgpd
-        if word_color == bg_color:  # 防止背景和字体颜色相同
+    def d1_bgtm_if_def(self):
+        global d1_bgtm_if
+        if d1_word_color == d1_bg_color:  # 防止背景和字体颜色相同
             messagebox.showwarning("警告", "背景和字体颜色不能相同")
         else:
-            if bgpd == 1:
+            if d1_bgtm_if == 1:
                 self.wm_attributes('-transparentcolor', '#796969')  # 将#796969色设置透明
-                bgpd = 0
+                d1_bgtm_if = 0
             else:
-                self.wm_attributes('-transparentcolor', bg_color)  # 将bg_color设置透明
-                bgpd = 1
+                self.wm_attributes('-transparentcolor', d1_bg_color)  # 将d1_bg_color设置透明
+                d1_bgtm_if = 1
         self.save()
 
     # 字体颜色自定义函数
-    def word_color_diy(self):
-        global word_color
+    def d1_word_color_diy(self):
+        global d1_word_color
         color = colorchooser.askcolor()
         if color != (None, None):
-            word_color = str(color)[-9:-2]
+            d1_word_color = str(color)[-9:-2]
 
-        self.l1.config(fg=word_color)
-        self.l2.config(fg=word_color)
-        self.l3.config(fg=word_color)
-        self.l4.config(fg=word_color)
-        self.l5.config(fg=word_color)
-        self.l6.config(fg=word_color)
+        self.l1.config(fg=d1_word_color)
+        self.l2.config(fg=d1_word_color)
+        self.l3.config(fg=d1_word_color)
+        self.l4.config(fg=d1_word_color)
+        self.l5.config(fg=d1_word_color)
+        self.l6.config(fg=d1_word_color)
         self.save()
 
     # 背景颜色自定义函数
-    def bg_color_diy(self):
-        global bg_color, bgpd
+    def d1_bg_color_diy(self):
+        global d1_bg_color, d1_bgtm_if
         color = colorchooser.askcolor()
         # print(str(color)[-9:-2])
         if color != (None, None):
-            bg_color = str(color)[-9:-2]
-        self.config(bg=bg_color)
-        self.frm1.config(bg=bg_color)
-        self.frm2.config(bg=bg_color)
-        self.frm3.config(bg=bg_color)
-        self.l1.config(bg=bg_color)
-        self.l2.config(bg=bg_color)
-        self.l3.config(bg=bg_color)
-        self.l4.config(bg=bg_color)
-        self.l5.config(bg=bg_color)
-        self.l6.config(bg=bg_color)
-        bgpd = 0
+            d1_bg_color = str(color)[-9:-2]
+        self.config(bg=d1_bg_color)
+        self.frm1.config(bg=d1_bg_color)
+        self.frm2.config(bg=d1_bg_color)
+        self.frm3.config(bg=d1_bg_color)
+        self.l1.config(bg=d1_bg_color)
+        self.l2.config(bg=d1_bg_color)
+        self.l3.config(bg=d1_bg_color)
+        self.l4.config(bg=d1_bg_color)
+        self.l5.config(bg=d1_bg_color)
+        self.l6.config(bg=d1_bg_color)
+        d1_bgtm_if = 0
         self.save()
 
     # 移动滑块函数
     def move_position(self):
         def show(val):
-            global shiftx_new
-            shiftx_new = int(val)
+            global d1_shiftx_new
+            d1_shiftx_new = int(val)
 
         def close():
             self.save()
             root.destroy()
 
         root = Tk()
-        root.geometry("+" + str(b[2] - b[0] - (int(d1_ckkd / 1.8)) - shiftx) + "+" + str(b[1] - 150))
+        root.geometry("+" + str(b[2] - b[0] - (int(d1_Window_width / 1.8)) - d1_shiftx) + "+" + str(b[1] - 150))
         root.resizable(width=False, height=False)  # 给窗口设置横轴竖轴的可缩放性
         root.overrideredirect(True)  # 隐藏窗口边框和任务栏图标
         root.wm_attributes('-alpha', 0.7)  # 设置窗口透明度
@@ -378,7 +378,7 @@ class InfobarTool(tkinter.Tk):
         s1 = Scale(root, orient='horizontal', activebackground='red', troughcolor='#0080FF', font=('微软雅黑', 10),
                    sliderlength=20, sliderrelief='flat', relief='ridge', resolution=1, from_=0, to=500, length=200,
                    command=show)
-        s1.set(shiftx)
+        s1.set(d1_shiftx)
         s1.pack()
         Button(root, text="关闭", font=('微软雅黑', 10, 'bold'), activeforeground='#0080FF', command=close).pack()
 
@@ -389,8 +389,8 @@ class InfobarTool(tkinter.Tk):
         out_file = open("%s.ini" % version, 'r+', encoding='utf-8')
         index = 0
 
-        dict_line = {4: shiftx, 7: bg_color, 10: word_color, 13: bgpd, 16: netpd, 19: select_pd, 22: d1_ckkd,
-                     25: d1_ssjg, 28: d1_24hfz}
+        dict_line = {4: d1_shiftx, 7: d1_bg_color, 10: d1_word_color, 13: d1_bgtm_if, 16: d1_net_if, 19: d1_select_if, 22: d1_Window_width,
+                     25: d1_price, 28: d1_price_float}
 
         for line in in_file:
             index = index + 1
@@ -445,7 +445,7 @@ class InfobarTool(tkinter.Tk):
             m_htaskbar = win32gui.FindWindow("Shell_TrayWnd", None)
             m_hbar = win32gui.FindWindowEx(m_htaskbar, 0, "ReBarWindow32", None)
             m_hmin = win32gui.FindWindowEx(m_hbar, 0, "MSTaskSwWClass", None)
-            win32gui.MoveWindow(m_hmin, 0, 0, b[2] - b[0] - d1_ckkd - shiftx, b[3] - b[1],
+            win32gui.MoveWindow(m_hmin, 0, 0, b[2] - b[0] - d1_Window_width - d1_shiftx, b[3] - b[1],
                                 True)  # 将MSTaskSwWClass缩小[x位置，y位置，宽，高]，预留窗口位置
 
             print('程序运行时间:' + str(runtime) + '秒')
@@ -459,7 +459,7 @@ class InfobarTool(tkinter.Tk):
 def app_quit():
     win32gui.MoveWindow(win32gui.FindWindowEx(win32gui.FindWindowEx(win32gui.FindWindow(
         "Shell_TrayWnd", None), 0, "ReBarWindow32", None), 0, "MSTaskSwWClass", None),
-        0, 0, b[2] - b[0] - shiftx, b[3] - b[1], True)  # 还原任务栏
+        0, 0, b[2] - b[0] - d1_shiftx, b[3] - b[1], True)  # 还原任务栏
     quit()
 
 
@@ -489,31 +489,31 @@ def restore_w():
     out_file = open("%s.ini" % version, 'w+', encoding='utf-8')
     r_w = ['这是配置文件，请勿胡乱修改！若因修改此文件导致软件异常，请恢复默认文件！',
            '-------------------------------------------------------------',
-           '##插入窗口距托盘区距离##shiftx = ',
+           '##插入窗口距托盘区距离##d1_shiftx = ',
            '62',
            '-----------------------------',
-           '##初始背景颜色##bg_color = ',
+           '##初始背景颜色##d1_bg_color = ',
            '#383838',
            '-----------------------------',
-           '##初始字体颜色##word_color = ',
+           '##初始字体颜色##d1_word_color = ',
            '#ffffff',
            '-----------------------------',
-           '##透明背景##bgpd = ',
+           '##透明背景##d1_bgtm_if = ',
            '1',
            '-----------------------------',
-           '##网速显示##netpd = ',
+           '##网速显示##d1_net_if = ',
            '1',
            '-----------------------------',
-           '##币种选择##select_pd =',
+           '##币种选择##d1_select_if =',
            '1',
            '-----------------------------',
-           '##显示窗口宽度##d1_ckkd =',
+           '##显示窗口宽度##d1_Window_width =',
            '181',
            '-----------------------------',
-           '##实时价格##d1_ssjg =',
+           '##实时价格##d1_price =',
            '1',
            '-----------------------------',
-           '##24H峰值##d1_24hfz =',
+           '##24H峰值##d1_price_float =',
            '1',
            '-----------------------------'
            ]
@@ -546,24 +546,34 @@ def zcm():
 
         result1 = simpledialog.askstring(title=version, prompt='获取此软件更新请关注微信公众号：MD野生科技\n\n'
                                                                '请输入验证口令：', initialvalue='关注微信公众号可永久获得注册码')
-        result = str(result1)
 
-        if result != code_jm2:
+        if str(result1) != code_jm2:
             messagebox.showinfo("验证口令错误", "关注微信公众号：MD野生科技\n\n便可永久获得注册码")
             root.destroy()
             quit()
 
-        if result == code_jm2:
+        if str(result1) == code_jm2:
             out_file = open("register.ini", 'w+', encoding='utf-8')
-            out_file.write(result)
+            out_file.write(str(result1))
             out_file.close()
             root.destroy()
         # # 加入消息循环
         # root.mainloop()
 
 
+# 判断是否有已存在进程，并结束
+def judge_process(processname):
+    pl = os.system('''tasklist|find /i "%s"''' % processname)
+    if pl == 0:
+        os.system('''taskkill /f /im "%s"''' % processname)  # 强制结束
+        return True
+    else:
+        print("未发现旧进程：%s" % processname)
+        return False
+
+
 if __name__ == '__main__':
-    result = os.popen("taskkill /f /im InfobarTool.exe")  # 结束已运行的程序
+    judge_process("InfobarTool.exe")
     remove_line = [4, 7, 10, 13, 16, 19, 22, 25, 28]
     version = "InfobarTool_v1.0.0"
     b = win32gui.GetWindowRect(
@@ -576,30 +586,30 @@ if __name__ == '__main__':
     # os.system(r"taskkill /f /t /im " + version + ".exe")  # 通过cmd命令杀死前一个进程
 
     try:
-        shiftx = int(linecache.getline("%s.ini" % version, remove_line[0]).replace(" ", "").strip('\n'))  # 去掉空格，去换行符
-        bg_color = linecache.getline("%s.ini" % version, remove_line[1]).replace(" ", "").strip('\n')
-        word_color = linecache.getline("%s.ini" % version, remove_line[2]).replace(" ", "").strip('\n')
-        bgpd = int(linecache.getline("%s.ini" % version, remove_line[3]).replace(" ", "").strip('\n'))
-        netpd = int(linecache.getline("%s.ini" % version, remove_line[4]).replace(" ", "").strip('\n'))
-        select_pd = int(linecache.getline("%s.ini" % version, remove_line[5]).replace(" ", "").strip('\n'))
-        d1_ckkd = int(linecache.getline("%s.ini" % version, remove_line[6]).replace(" ", "").strip('\n'))
-        d1_ssjg = int(linecache.getline("%s.ini" % version, remove_line[7]).replace(" ", "").strip('\n'))
-        d1_24hfz = int(linecache.getline("%s.ini" % version, remove_line[8]).replace(" ", "").strip('\n'))
-        shiftx_new = shiftx
+        d1_shiftx = int(linecache.getline("%s.ini" % version, remove_line[0]).replace(" ", "").strip('\n'))  # 去掉空格，去换行符
+        d1_bg_color = linecache.getline("%s.ini" % version, remove_line[1]).replace(" ", "").strip('\n')
+        d1_word_color = linecache.getline("%s.ini" % version, remove_line[2]).replace(" ", "").strip('\n')
+        d1_bgtm_if = int(linecache.getline("%s.ini" % version, remove_line[3]).replace(" ", "").strip('\n'))
+        d1_net_if = int(linecache.getline("%s.ini" % version, remove_line[4]).replace(" ", "").strip('\n'))
+        d1_select_if = int(linecache.getline("%s.ini" % version, remove_line[5]).replace(" ", "").strip('\n'))
+        d1_Window_width = int(linecache.getline("%s.ini" % version, remove_line[6]).replace(" ", "").strip('\n'))
+        d1_price = int(linecache.getline("%s.ini" % version, remove_line[7]).replace(" ", "").strip('\n'))
+        d1_price_float = int(linecache.getline("%s.ini" % version, remove_line[8]).replace(" ", "").strip('\n'))
+        d1_shiftx_new = d1_shiftx
 
     except Exception as err:
         print(err)
         restore_w()
-        shiftx = int(linecache.getline("%s.ini" % version, remove_line[0]).replace(" ", "").strip('\n'))  # 去掉空格，去换行符
-        bg_color = linecache.getline("%s.ini" % version, remove_line[1]).replace(" ", "").strip('\n')
-        word_color = linecache.getline("%s.ini" % version, remove_line[2]).replace(" ", "").strip('\n')
-        bgpd = int(linecache.getline("%s.ini" % version, remove_line[3]).replace(" ", "").strip('\n'))
-        netpd = int(linecache.getline("%s.ini" % version, remove_line[4]).replace(" ", "").strip('\n'))
-        select_pd = int(linecache.getline("%s.ini" % version, remove_line[5]).replace(" ", "").strip('\n'))
-        d1_ckkd = int(linecache.getline("%s.ini" % version, remove_line[6]).replace(" ", "").strip('\n'))
-        d1_ssjg = int(linecache.getline("%s.ini" % version, remove_line[7]).replace(" ", "").strip('\n'))
-        d1_24hfz = int(linecache.getline("%s.ini" % version, remove_line[8]).replace(" ", "").strip('\n'))
-        shiftx_new = shiftx
+        d1_shiftx = int(linecache.getline("%s.ini" % version, remove_line[0]).replace(" ", "").strip('\n'))  # 去掉空格，去换行符
+        d1_bg_color = linecache.getline("%s.ini" % version, remove_line[1]).replace(" ", "").strip('\n')
+        d1_word_color = linecache.getline("%s.ini" % version, remove_line[2]).replace(" ", "").strip('\n')
+        d1_bgtm_if = int(linecache.getline("%s.ini" % version, remove_line[3]).replace(" ", "").strip('\n'))
+        d1_net_if = int(linecache.getline("%s.ini" % version, remove_line[4]).replace(" ", "").strip('\n'))
+        d1_select_if = int(linecache.getline("%s.ini" % version, remove_line[5]).replace(" ", "").strip('\n'))
+        d1_Window_width = int(linecache.getline("%s.ini" % version, remove_line[6]).replace(" ", "").strip('\n'))
+        d1_price = int(linecache.getline("%s.ini" % version, remove_line[7]).replace(" ", "").strip('\n'))
+        d1_price_float = int(linecache.getline("%s.ini" % version, remove_line[8]).replace(" ", "").strip('\n'))
+        d1_shiftx_new = d1_shiftx
 
     app = InfobarTool()
     app.mainloop()
