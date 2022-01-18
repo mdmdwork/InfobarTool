@@ -2,12 +2,14 @@ import linecache
 import time
 import tkinter
 from tkinter import *
-from tkinter import messagebox, colorchooser, simpledialog
+from tkinter import messagebox, colorchooser
+from requests.adapters import HTTPAdapter
 import psutil
 import requests
 import win32gui
-import os
-from requests.adapters import HTTPAdapter
+import win32event
+import win32api
+import sys
 
 
 class InfobarTool(tkinter.Tk):
@@ -70,7 +72,7 @@ class InfobarTool(tkinter.Tk):
         self.windows2()
 
     # tkinter控件显示逻辑
-    def tk_show(self, function, text_v1, text_v2):
+    def tk_show(self, function, text_v1, text_v2, font_v1, font_v2):
         def frm_forget():
             if self.var_frm1.get() == 0:
                 self.frm1.pack_forget()
@@ -87,8 +89,8 @@ class InfobarTool(tkinter.Tk):
             self.frm2.pack(side='left', expand=YES, fill=BOTH)
             self.frm3.pack(side='left', expand=YES, fill=BOTH)
             frm_forget()
-            self.l1.config(text=text_v1)
-            self.l2.config(text=text_v2)
+            self.l1.config(text=text_v1, font=font_v1)
+            self.l2.config(text=text_v2, font=font_v2)
             self.l1.pack(expand=YES, fill=Y)
             self.l2.pack(expand=YES, fill=Y)
         if self.var_frm2.get() == function:
@@ -99,8 +101,8 @@ class InfobarTool(tkinter.Tk):
             self.frm2.pack(side='left', expand=YES, fill=BOTH)
             self.frm3.pack(side='left', expand=YES, fill=BOTH)
             frm_forget()
-            self.l3.config(text=text_v1)
-            self.l4.config(text=text_v2)
+            self.l3.config(text=text_v1, font=font_v1)
+            self.l4.config(text=text_v2, font=font_v2)
             self.l3.pack(expand=YES, fill=Y)
             self.l4.pack(expand=YES, fill=Y)
         if self.var_frm3.get() == function:
@@ -111,8 +113,8 @@ class InfobarTool(tkinter.Tk):
             self.frm2.pack(side='left', expand=YES, fill=BOTH)
             self.frm3.pack(side='left', expand=YES, fill=BOTH)
             frm_forget()
-            self.l5.config(text=text_v1)
-            self.l6.config(text=text_v2)
+            self.l5.config(text=text_v1, font=font_v1)
+            self.l6.config(text=text_v2, font=font_v2)
             self.l5.pack(expand=YES, fill=Y)
             self.l6.pack(expand=YES, fill=Y)
 
@@ -135,7 +137,9 @@ class InfobarTool(tkinter.Tk):
             net_sent = '⇡' + formatnum((net1.bytes_sent - net0.bytes_sent) * 1)
             net_recv = '⇣' + formatnum((net1.bytes_recv - net0.bytes_recv) * 1)
             self.net_text_first = psutil.net_io_counters()
-            self.tk_show(3, net_sent, net_recv)
+            font1 = ('等线', 10, 'bold')
+            font2 = ('等线', 10, 'bold')
+            self.tk_show(3, net_sent, net_recv, font1, font2)
         else:
             pass
         self.after(995, self.net_if)  # 考虑程序执行延迟采用995毫秒
@@ -145,7 +149,9 @@ class InfobarTool(tkinter.Tk):
         if 4 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
             cpu = f"CPU{psutil.cpu_percent()}%"
             mem = f"内存{psutil.virtual_memory().percent}%"
-            self.tk_show(4, cpu, mem)
+            font1 = ('等线', 10, 'bold')
+            font2 = ('等线', 10, 'bold')
+            self.tk_show(4, cpu, mem, font1, font2)
         self.after(995, self.cpu_mem)
 
     @staticmethod
@@ -209,14 +215,20 @@ class InfobarTool(tkinter.Tk):
                     add_btc = "%.1f%%" % (((float(buy_btc) - float(base_btc)) / float(base_btc)) * 100)
 
                 if 1 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
-                    self.tk_show(1, (select_name + ' ' + add_btc), ('$' + buy_btc))
+                    font1 = ('等线', 10, 'bold')
+                    font2 = ('等线', 11, 'bold')
+                    self.tk_show(1, (select_name + ' ' + add_btc), ('$' + buy_btc), font1, font2)
                 if 2 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
-                    self.tk_show(2, ('⇡' + high_btc), ('⇣' + low_btc))
+                    font1 = ('等线', 10, 'bold')
+                    font2 = ('等线', 10, 'bold')
+                    self.tk_show(2, ('⇡' + high_btc), ('⇣' + low_btc), font1, font2)
             except Exception as err1:
+                font1 = ('等线', 10, 'bold')
+                font2 = ('等线', 10, 'bold')
                 if 1 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
-                    self.tk_show(1, "无数据", "无数据")
+                    self.tk_show(1, "无数据", "无数据", font1, font2)
                 if 2 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
-                    self.tk_show(2, "无数据", "无数据")
+                    self.tk_show(2, "无数据", "无数据", font1, font2)
                 print(err1)
         else:
             print("单机模式，虚拟币数据已暂停获取")
@@ -317,10 +329,17 @@ class InfobarTool(tkinter.Tk):
         menubar.add_separator()  # 添加菜单横线
         menubar.add_cascade(label="恢复默认", menu=fmenu2)
         menubar.add_cascade(label="程序说明", command=self.about)
-        menubar.add_cascade(label="关闭程序", command=app_quit, background='#C8C8C8')
+        menubar.add_cascade(label="关闭程序", command=self.app_quit, background='#C8C8C8')
 
         menubar.post(event.x_root - 65, event.y_root - 30)
         print('右键菜单点击')
+
+    # 退出函数，还原之前的状态栏窗口大小
+    def app_quit(self):
+        win32gui.MoveWindow(win32gui.FindWindowEx(win32gui.FindWindowEx(win32gui.FindWindow(
+            "Shell_TrayWnd", None), 0, "ReBarWindow32", None), 0, "MSTaskSwWClass", None),
+            0, 0, b[2] - b[0] - d1_shiftx, b[3] - b[1], True)  # 还原任务栏
+        self.quit()
 
     # 是否选中判断
     def sz_pd(self):
@@ -338,10 +357,10 @@ class InfobarTool(tkinter.Tk):
 
         if list_frm.count(0) == 3:
             self.var_frm3.set(3)
-            self.new_d1_Window_width = 80
+            self.new_d1_Window_width = 70
             messagebox.showinfo(version, "不支持功能全关，已自动帮你打开仅显示网速模式\n\n另外：若是因修改配置文件导致该情况，重启即可恢复正常")
         if list_frm.count(0) == 2:
-            self.new_d1_Window_width = 80
+            self.new_d1_Window_width = 70
         if list_frm.count(0) == 1:
             self.new_d1_Window_width = 130
         if list_frm.count(0) == 0:
@@ -501,14 +520,6 @@ class InfobarTool(tkinter.Tk):
         self.after(60000, self.windows2)
 
 
-# 退出函数，还原之前的状态栏窗口大小
-def app_quit():
-    win32gui.MoveWindow(win32gui.FindWindowEx(win32gui.FindWindowEx(win32gui.FindWindow(
-        "Shell_TrayWnd", None), 0, "ReBarWindow32", None), 0, "MSTaskSwWClass", None),
-        0, 0, b[2] - b[0] - d1_shiftx, b[3] - b[1], True)  # 还原任务栏
-    quit()
-
-
 # 白底黑字模式函数
 def restore_b():
     # dict_line = {7: '#d5d5d5', 10: '#2b2b2b'}
@@ -573,16 +584,17 @@ def restore_w():
 
 
 def zcm():
-    code_pd = linecache.getline("register.ini", 1).strip('\n')
+    global code_pd
     print("验证口令：" + code_pd)
-    code_jm2 = "软件开发来自微信公众号：MD野生科技"
-    if code_pd != code_jm2:
+    if code_pd == code_jm:
+        return 1
+    else:
         # 创建主窗口
         root = tkinter.Tk()
-        root.withdraw()
+        root.title("初次启动验证")
 
-        curwidth = root.winfo_width()
-        curhight = root.winfo_height()
+        curwidth = 400
+        curhight = 200
         scn_w, scn_h = root.maxsize()
         cen_x = (scn_w - curwidth) / 2
         cen_y = (scn_h - curhight) / 2
@@ -590,46 +602,61 @@ def zcm():
         root.geometry(size_xy)
         root.update()  # 窗体居中
 
-        result1 = simpledialog.askstring(title=version, prompt='获取此软件更新请关注微信公众号：MD野生科技\n\n'
-                                                               '请输入验证口令：', initialvalue='关注微信公众号可永久获得注册码')
+        def zcm_def():
+            global code_pd
+            result1 = e1.get()
+            if str(result1) != code_jm:
+                messagebox.showinfo("错误", "验证口令错误！请手动输入微信公众号名称！")
+                # root.destroy()
+                # sys.exit()
 
-        if str(result1) != code_jm2:
-            messagebox.showinfo("验证口令错误", "关注微信公众号：MD野生科技\n\n便可永久获得注册码")
-            root.destroy()
-            quit()
+            if str(result1) == code_jm:
+                out_file = open("register.ini", 'w+', encoding='utf-8')
+                out_file.write(str(result1))
+                out_file.close()
+                root.destroy()
+                code_pd = str(result1)
 
-        if str(result1) == code_jm2:
-            out_file = open("register.ini", 'w+', encoding='utf-8')
-            out_file.write(str(result1))
-            out_file.close()
-            root.destroy()
-        # # 加入消息循环
-        # root.mainloop()
+        l1 = Label(root, text="获取此软件更新请关注微信公众号：MD野生科技", font=('微软雅黑', 12), padx=0, pady=10, width=0, height=0)
+        l1.pack(side='top')
+        l2 = Label(root, text="请在下部文本框中手动输入微信公众号名称", font=('微软雅黑', 12), padx=0, pady=10, width=0, height=0)
+        l2.pack(side='top')
 
+        f1 = Frame(root)
+        l2 = Label(f1, text="验证口令:", font=('微软雅黑', 12), padx=0, pady=0, borderwidth=0, width=0, height=0)
+        e1 = Entry(f1, font=('微软雅黑', 12))
+        f1.pack(side='top', expand=YES, fill=BOTH)
+        l2.pack(side='left', padx=5)
+        e1.pack(side='left', padx=10, expand=YES, fill=X)
 
-# 判断是否有已存在进程，并结束
-def judge_process(processname):
-    pl = os.system('''tasklist|find /i "%s"''' % processname)
-    if pl == 0:
-        os.system('''taskkill /f /im "%s"''' % processname)  # 强制结束
-        return True
-    else:
-        print("未发现旧进程：%s" % processname)
-        return False
+        b1 = Button(root, text='确定', font=('微软雅黑', 12), width=5, height=1, command=zcm_def)
+        b1.pack(pady=10)
+        root.mainloop()
+        return 0
 
 
 if __name__ == '__main__':
-    judge_process("InfobarTool.exe")
+    # 重复启动验证
+    mutex = win32event.CreateMutex(None, False, 'InfobarTool_is_Running')
+    if win32api.GetLastError() > 0:
+        print('程序已启动')
+        root1 = tkinter.Tk()
+        root1.withdraw()
+        messagebox.showinfo("打开失败", "程序已启动，请关闭或检查当前已启动的程序")
+        sys.exit()
+    # 初始化变量
+    version = "InfobarTool_v1.0.2"
+    code_jm = "MD野生科技"
+    code_pd = linecache.getline("register.ini", 1).strip('\n')
     remove_line = [4, 7, 10, 13, 16, 19, 22, 25, 28]
-    version = "InfobarTool_v1.0.1"
     b = win32gui.GetWindowRect(
         win32gui.FindWindowEx(
             win32gui.FindWindow("Shell_TrayWnd", None), 0, "ReBarWindow32", None))
     runtime = 0  # 程序运行起始时间
 
-    # 注册码验证
-    zcm()
-    # os.system(r"taskkill /f /t /im " + version + ".exe")  # 通过cmd命令杀死前一个进程
+    # 验证口令
+    if zcm() != 1 and code_pd != code_jm:
+        sys.exit()
 
     try:
         d1_shiftx = int(linecache.getline("%s.ini" % version, remove_line[0]).replace(" ", "").strip('\n'))  # 去掉空格，去换行符
