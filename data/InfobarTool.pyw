@@ -80,7 +80,10 @@ class InfobarTool(tkinter.Tk):
                 self.frm2.pack_forget()
             if self.var_frm3.get() == 0:
                 self.frm3.pack_forget()
-
+        if font_v1 == 0:
+            font_v1 = ('等线', 10, 'bold')
+        if font_v2 == 0:
+            font_v2 = ('等线', 10, 'bold')
         if self.var_frm1.get() == function:
             self.frm1.pack_forget()
             self.frm2.pack_forget()
@@ -134,12 +137,10 @@ class InfobarTool(tkinter.Tk):
 
             net0 = self.net_text_first
             net1 = psutil.net_io_counters()
-            net_sent = '⇡' + formatnum((net1.bytes_sent - net0.bytes_sent) * 1)
-            net_recv = '⇣' + formatnum((net1.bytes_recv - net0.bytes_recv) * 1)
+            net_sent = '⇡%s' % formatnum((net1.bytes_sent - net0.bytes_sent) * 1)
+            net_recv = '⇣%s' % formatnum((net1.bytes_recv - net0.bytes_recv) * 1)
             self.net_text_first = psutil.net_io_counters()
-            font1 = ('等线', 10, 'bold')
-            font2 = ('等线', 10, 'bold')
-            self.tk_show(3, net_sent, net_recv, font1, font2)
+            self.tk_show(3, net_sent, net_recv, 0, 0)
         else:
             pass
         self.after(995, self.net_if)  # 考虑程序执行延迟采用995毫秒
@@ -147,11 +148,11 @@ class InfobarTool(tkinter.Tk):
     # cpu和内存占用信息获取
     def cpu_mem(self):
         if 4 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
-            cpu = f"CPU{psutil.cpu_percent()}%"
-            mem = f"内存{psutil.virtual_memory().percent}%"
-            font1 = ('等线', 10, 'bold')
-            font2 = ('等线', 10, 'bold')
-            self.tk_show(4, cpu, mem, font1, font2)
+            cpu = f"CPU%04.1f%%" % psutil.cpu_percent()  # 规定显示位数，不够用0占位
+            mem = f"内存%04.1f%%" % psutil.virtual_memory().percent
+            # cpu = f"CPU{psutil.cpu_percent()}%"
+            # mem = f"内存{psutil.virtual_memory().percent}%"
+            self.tk_show(4, cpu, mem, 0, 0)
         self.after(995, self.cpu_mem)
 
     @staticmethod
@@ -169,16 +170,17 @@ class InfobarTool(tkinter.Tk):
 
         try:
             response = s.get(url=url, headers=headers)
+            # response = json.loads(response.text)
+            aa = response.text
+            # print(aa[0])
+            aa_list = aa.replace("\n", "").split(";")  # 将换行符号替换为空，并按；分割为列表
+            # print(aa_list[0])
             print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + ' 数据更新成功！')
-        except Exception:
+        except Exception as err3:
             response = s.get(url=url, headers=headers, proxies=proxies)
+            aa = response.text+str(err3)  # 为了消除pycharm警告....
+            aa_list = aa.replace("\n", "").split(";")  # 将换行符号替换为空，并按；分割为列表
             print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + ' 数据更新成功！使用v2ray代理端口')
-
-        # response = json.loads(response.text)
-        aa = response.text
-        # print(aa[0])
-        aa_list = aa.replace("\n", "").split(";")  # 将换行符号替换为空，并按；分割为列表
-        # print(aa_list[0])
         return aa_list
 
     def update_btcdata2(self):
@@ -209,26 +211,17 @@ class InfobarTool(tkinter.Tk):
                 # low_btc = "%.0f" % float(45500)
                 # base_btc = "%.1f" % float(44000)
 
-                if buy_btc > base_btc:
-                    add_btc = "+%.1f%%" % (((float(buy_btc) - float(base_btc)) / float(base_btc)) * 100)
-                else:
-                    add_btc = "%.1f%%" % (((float(buy_btc) - float(base_btc)) / float(base_btc)) * 100)
+                add_btc = "%+.1f%%" % (((float(buy_btc) - float(base_btc)) / float(base_btc)) * 100)
 
                 if 1 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
-                    font1 = ('等线', 10, 'bold')
-                    font2 = ('等线', 11, 'bold')
-                    self.tk_show(1, (select_name + ' ' + add_btc), ('$' + buy_btc), font1, font2)
+                    self.tk_show(1, (select_name + ' ' + add_btc), ('$ ' + buy_btc), 0, 0)
                 if 2 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
-                    font1 = ('等线', 10, 'bold')
-                    font2 = ('等线', 10, 'bold')
-                    self.tk_show(2, ('⇡' + high_btc), ('⇣' + low_btc), font1, font2)
+                    self.tk_show(2, ('⇡' + high_btc), ('⇣' + low_btc), 0, 0)
             except Exception as err1:
-                font1 = ('等线', 10, 'bold')
-                font2 = ('等线', 10, 'bold')
                 if 1 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
-                    self.tk_show(1, "无数据", "无数据", font1, font2)
+                    self.tk_show(1, "无数据", "无数据", 0, 0)
                 if 2 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
-                    self.tk_show(2, "无数据", "无数据", font1, font2)
+                    self.tk_show(2, "无数据", "无数据", 0, 0)
                 print(err1)
         else:
             print("单机模式，虚拟币数据已暂停获取")
@@ -648,6 +641,7 @@ if __name__ == '__main__':
     version = "InfobarTool_v1.0.2"
     code_jm = "MD野生科技"
     code_pd = linecache.getline("register.ini", 1).strip('\n')
+    linecache.clearcache()
     remove_line = [4, 7, 10, 13, 16, 19, 22, 25, 28]
     b = win32gui.GetWindowRect(
         win32gui.FindWindowEx(
@@ -673,6 +667,7 @@ if __name__ == '__main__':
     except Exception as err:
         print(err)
         restore_w()
+        linecache.clearcache()  # linecach重复读取，不清理的话会直接从缓存中读取
         d1_shiftx = int(linecache.getline("%s.ini" % version, remove_line[0]).replace(" ", "").strip('\n'))  # 去掉空格，去换行符
         d1_bg_color = linecache.getline("%s.ini" % version, remove_line[1]).replace(" ", "").strip('\n')
         d1_word_color = linecache.getline("%s.ini" % version, remove_line[2]).replace(" ", "").strip('\n')
