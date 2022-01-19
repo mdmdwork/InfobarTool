@@ -31,9 +31,9 @@
 4. 程序显示窗口位置可调  
 
 #### 主窗口图片：
-　　　　　　　　![图片1](images/img2.png)　　　　![图片2](images/img.png)
+　　　　　　　　![图片1](show/img2.png)　　　　![图片2](show/img.png)
 #### 菜单图：
-　　　　　![图片3](images/img3.png)
+　　　　　![图片3](show/img3.png)
 ## 使用说明
 本仓库提供exe打包文件（目前仅在win10版本测试），可前往右侧 ***release*** 下载最新打包版本
 #### 验证口令:

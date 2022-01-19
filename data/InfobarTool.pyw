@@ -10,6 +10,7 @@ import win32gui
 import win32event
 import win32api
 import sys
+import os
 
 
 class InfobarTool(tkinter.Tk):
@@ -80,6 +81,7 @@ class InfobarTool(tkinter.Tk):
                 self.frm2.pack_forget()
             if self.var_frm3.get() == 0:
                 self.frm3.pack_forget()
+
         if font_v1 == 0:
             font_v1 = ('等线', 10, 'bold')
         if font_v2 == 0:
@@ -178,7 +180,7 @@ class InfobarTool(tkinter.Tk):
             print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + ' 数据更新成功！')
         except Exception as err3:
             response = s.get(url=url, headers=headers, proxies=proxies)
-            aa = response.text+str(err3)  # 为了消除pycharm警告....
+            aa = response.text + str(err3)  # 为了消除pycharm警告....
             aa_list = aa.replace("\n", "").split(";")  # 将换行符号替换为空，并按；分割为列表
             print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + ' 数据更新成功！使用v2ray代理端口')
         return aa_list
@@ -513,6 +515,15 @@ class InfobarTool(tkinter.Tk):
         self.after(60000, self.windows2)
 
 
+# 定义一个读取相对路径的函数
+def resource_path(relative_path):
+    if hasattr(sys, "_MEIPASS"):
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.abspath(".")
+    return os.path.join(base_path, relative_path)
+
+
 # 白底黑字模式函数
 def restore_b():
     # dict_line = {7: '#d5d5d5', 10: '#2b2b2b'}
@@ -573,9 +584,7 @@ def restore_w():
     print('切换黑底白字模式，重启程序生效')
 
 
-'''程序注册码函数'''
-
-
+# 程序注册码函数
 def zcm():
     global code_pd
     print("验证口令：" + code_pd)
@@ -585,6 +594,7 @@ def zcm():
         # 创建主窗口
         root = tkinter.Tk()
         root.title("初次启动验证")
+        root.iconbitmap(resource_path(r'resources\images\logo.ico'))  # 设置图标，没有图片会报错
 
         curwidth = 400
         curhight = 200
@@ -643,9 +653,7 @@ if __name__ == '__main__':
     code_pd = linecache.getline("register.ini", 1).strip('\n')
     linecache.clearcache()
     remove_line = [4, 7, 10, 13, 16, 19, 22, 25, 28]
-    b = win32gui.GetWindowRect(
-        win32gui.FindWindowEx(
-            win32gui.FindWindow("Shell_TrayWnd", None), 0, "ReBarWindow32", None))
+    b = win32gui.GetWindowRect(win32gui.FindWindowEx(win32gui.FindWindow("Shell_TrayWnd", None), 0, "ReBarWindow32", None))
     runtime = 0  # 程序运行起始时间
 
     # 验证口令
