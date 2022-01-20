@@ -30,8 +30,8 @@ VSVersionInfo(
       StringTable(
         u'080403a8',
         [StringStruct(u'Comments', u'InfobarTool'),
-        StringStruct(u'CompanyName', u'MD野生科技'),
-        StringStruct(u'FileDescription', u'软件开源地址: https://github.com/mdmdwork/InfobarTool'),
+        StringStruct(u'CompanyName', u'开源地址https://github.com/mdmdwork/InfobarTool'),
+        StringStruct(u'FileDescription', u'InfobarTool_v1.0.2'),
         StringStruct(u'FileVersion', u'1.0.2'),
         StringStruct(u'LegalCopyright', u'Copyright (C) 2022-2042 MD野生科技. All Rights Reserved'),
         StringStruct(u'ProductName', u'InfobarTool'),
