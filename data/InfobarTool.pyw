@@ -1,6 +1,7 @@
 import linecache
 import time
 import tkinter
+import webbrowser
 from tkinter import *
 from tkinter import messagebox, colorchooser
 from requests.adapters import HTTPAdapter
@@ -42,23 +43,32 @@ class InfobarTool(tkinter.Tk):
         self.overrideredirect(True)  # 隐藏窗口边框和任务栏图标
         self.wm_attributes('-topmost', 1)  # 设置窗口置顶
         # self.attributes("-disabled", True)  # 可用"-toolwindow"（只显示关闭按钮）,"-fullscreen"（充满屏幕）,"-disabled"（不可点击）
-
         self.frm1 = Frame(self, bg=d1_bg_color, cursor='heart')
         self.frm2 = Frame(self, bg=d1_bg_color, cursor='heart')
         self.frm3 = Frame(self, bg=d1_bg_color, cursor='heart')
 
         self.l1 = Label(self.frm1, padx=0, pady=0, borderwidth=0, width=0, height=0, fg=d1_word_color, bg=d1_bg_color,
-                        font=('等线', 10, 'bold'), text="虚拟币种类")
+                        font=('等线', 10, 'bold'), text="1")
         self.l2 = Label(self.frm1, padx=0, pady=0, borderwidth=0, width=0, height=0, fg=d1_word_color, bg=d1_bg_color,
-                        font=('等线', 10, 'bold'), text="实时价格")
+                        font=('等线', 10, 'bold'), text="1")
         self.l3 = Label(self.frm2, padx=0, pady=0, borderwidth=0, width=0, height=0, fg=d1_word_color, bg=d1_bg_color,
-                        font=('等线', 10, 'bold'), text="24H高价")
+                        font=('等线', 10, 'bold'), text="2")
         self.l4 = Label(self.frm2, padx=0, pady=0, borderwidth=0, width=0, height=0, fg=d1_word_color, bg=d1_bg_color,
-                        font=('等线', 10, 'bold'), text="24H低价")
+                        font=('等线', 10, 'bold'), text="2")
         self.l5 = Label(self.frm3, padx=0, pady=0, borderwidth=0, width=0, height=0, fg=d1_word_color, bg=d1_bg_color,
-                        font=('等线', 10, 'bold'), text="上传速度")
+                        font=('等线', 10, 'bold'), text="3")
         self.l6 = Label(self.frm3, padx=0, pady=0, borderwidth=0, width=0, height=0, fg=d1_word_color, bg=d1_bg_color,
-                        font=('等线', 10, 'bold'), text="下载速度")
+                        font=('等线', 10, 'bold'), text="3")
+
+        self.frm1.pack(side='left', expand=YES, fill=BOTH)
+        self.frm2.pack(side='left', expand=YES, fill=BOTH)
+        self.frm3.pack(side='left', expand=YES, fill=BOTH)
+        self.l1.pack(expand=YES, fill=Y)
+        self.l2.pack(expand=YES, fill=Y)
+        self.l3.pack(expand=YES, fill=Y)
+        self.l4.pack(expand=YES, fill=Y)
+        self.l5.pack(expand=YES, fill=Y)
+        self.l6.pack(expand=YES, fill=Y)
 
         # 插入图片示例
         # image1 = PhotoImage(file='***.png')
@@ -66,8 +76,8 @@ class InfobarTool(tkinter.Tk):
         # label1.pack(side='top', expand='yes')
 
         self.bind("<Button-3>", self.showmenu)
-        self.update_btcdata2()
-        self.net_if()
+        self.update_btcdata()
+        self.net()
         self.cpu_mem()
         self.window_to_taskbar()
         self.windows2()
@@ -124,7 +134,7 @@ class InfobarTool(tkinter.Tk):
             self.l6.pack(expand=YES, fill=Y)
 
     # 网速信息获取
-    def net_if(self):
+    def net(self):
         if 3 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:  # 首先先判断是否需要显示网速
             def formatnum(size):
                 ds = ['', 'k', 'm', 'g', 't']
@@ -145,7 +155,7 @@ class InfobarTool(tkinter.Tk):
             self.tk_show(3, net_sent, net_recv, 0, 0)
         else:
             pass
-        self.after(995, self.net_if)  # 考虑程序执行延迟采用995毫秒
+        self.after(995, self.net)  # 考虑程序执行延迟采用995毫秒
 
     # cpu和内存占用信息获取
     def cpu_mem(self):
@@ -157,44 +167,38 @@ class InfobarTool(tkinter.Tk):
             self.tk_show(4, cpu, mem, 0, 0)
         self.after(995, self.cpu_mem)
 
-    @staticmethod
-    def update_btcdata():
+    # 虚拟货币实时价格信息获取
+    def update_btcdata(self):
+        global d1_select_if
         url = 'https://www.usd-cny.com/data/b.js'
         headers = {
             "Connection": "close",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36 Edg/96.0.1054.62"
+            "User-Agent": "Edg/96.0.1054.62"
         }
         proxies = {'http': "http://127.0.0.1:10809",
                    'https': "http://127.0.0.1:10809"}
-        s = requests.Session()
-        s.mount('http://', HTTPAdapter(max_retries=2))
-        s.mount('https://', HTTPAdapter(max_retries=2))  # 设置重试次数为2次
-
+        requests.Session().mount('http://', HTTPAdapter(max_retries=2))
+        requests.Session().mount('https://', HTTPAdapter(max_retries=2))  # 设置重试次数为2次
         try:
-            response = s.get(url=url, headers=headers)
-            # response = json.loads(response.text)
-            aa = response.text
-            # print(aa[0])
-            aa_list = aa.replace("\n", "").split(";")  # 将换行符号替换为空，并按；分割为列表
-            # print(aa_list[0])
-            print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + ' 数据更新成功！')
-        except Exception as err3:
-            response = s.get(url=url, headers=headers, proxies=proxies)
-            aa = response.text + str(err3)  # 为了消除pycharm警告....
-            aa_list = aa.replace("\n", "").split(";")  # 将换行符号替换为空，并按；分割为列表
-            print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + ' 数据更新成功！使用v2ray代理端口')
-        return aa_list
-
-    def update_btcdata2(self):
-        global d1_select_if
-        if 1 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()] or \
-                2 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
             try:
-                aa_list = self.update_btcdata()
+                response = requests.get(url=url, headers=headers)
+                # response = json.loads(response.text)
+                aa_list = response.text.replace("\n", "").split(";")  # 将换行符号替换为空，并按；分割为列表
+                response.close()
+                # print(aa_list[0])
+                print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + ' 数据更新成功！')
+            except Exception:
+                response = requests.get(url=url, headers=headers, proxies=proxies)
+                aa_list = response.text.replace("\n", "").split(";")  # 将换行符号替换为空，并按；分割为列表
+                response.close()
+                print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + ' 数据更新成功！使用v2ray代理端口')
+
+            if 1 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()] or \
+                    2 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
+
                 if d1_select_if == 1:
                     select_name = 'BTC'
                     data_list = aa_list[0].replace("var hq_str_btc_btcbtcusd=", "").replace("\"", "").split(",")
-                    # print(data_list)
                 elif d1_select_if == 2:
                     select_name = 'ETH'
                     data_list = aa_list[2].replace("var hq_str_btc_btcethusd=", "").replace("\"", "").split(",")
@@ -206,6 +210,7 @@ class InfobarTool(tkinter.Tk):
                 high_btc = "%.0f" % float(data_list[6])
                 low_btc = "%.0f" % float(data_list[7])
                 base_btc = "%.1f" % float(data_list[5])
+                print(buy_btc + " " + high_btc + " " + low_btc + " " + base_btc)
 
                 # 测试专用
                 # buy_btc = "%.1f" % float(45000)
@@ -219,16 +224,16 @@ class InfobarTool(tkinter.Tk):
                     self.tk_show(1, (select_name + ' ' + add_btc), ('$ ' + buy_btc), 0, 0)
                 if 2 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
                     self.tk_show(2, ('⇡' + high_btc), ('⇣' + low_btc), 0, 0)
-            except Exception as err1:
-                if 1 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
-                    self.tk_show(1, "无数据", "无数据", 0, 0)
-                if 2 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
-                    self.tk_show(2, "无数据", "无数据", 0, 0)
-                print(err1)
-        else:
-            print("单机模式，虚拟币数据已暂停获取")
-            pass
-        self.after(5000, self.update_btcdata2)  # 5秒钟执行一次该方法
+            else:
+                print("单机模式，虚拟币数据已暂停获取")
+                pass
+        except Exception as err1:
+            if 1 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
+                self.tk_show(1, "无数据", "无数据", 0, 0)
+            if 2 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
+                self.tk_show(2, "无数据", "无数据", 0, 0)
+            print(err1)
+        self.after(5000, self.update_btcdata)  # 5秒钟执行一次该方法
 
     # 将窗口放置在任务栏并监控任务栏变化
     def window_to_taskbar(self):
@@ -323,7 +328,7 @@ class InfobarTool(tkinter.Tk):
         menubar.add_cascade(label="移动此工具位置", command=self.move_position)
         menubar.add_separator()  # 添加菜单横线
         menubar.add_cascade(label="恢复默认", menu=fmenu2)
-        menubar.add_cascade(label="程序说明", command=self.about)
+        menubar.add_cascade(label="程序说明", command=about)
         menubar.add_cascade(label="关闭程序", command=self.app_quit, background='#C8C8C8')
 
         menubar.post(event.x_root - 65, event.y_root - 30)
@@ -354,6 +359,7 @@ class InfobarTool(tkinter.Tk):
             self.var_frm3.set(3)
             self.new_d1_Window_width = 70
             messagebox.showinfo(version, "不支持功能全关，已自动帮你打开仅显示网速模式\n\n另外：若是因修改配置文件导致该情况，重启即可恢复正常")
+            self.save()
         if list_frm.count(0) == 2:
             self.new_d1_Window_width = 70
         if list_frm.count(0) == 1:
@@ -362,9 +368,9 @@ class InfobarTool(tkinter.Tk):
             self.new_d1_Window_width = 180
 
         d1_select_if = self.select.get()
-        d1_frm1 = l_frm1
-        d1_frm2 = l_frm2
-        d1_frm3 = l_frm3
+        d1_frm1 = self.var_frm1.get()
+        d1_frm2 = self.var_frm2.get()
+        d1_frm3 = self.var_frm3.get()
         self.save()
 
     # 透明/有色背景判断函数
@@ -463,41 +469,6 @@ class InfobarTool(tkinter.Tk):
         out_file.close()
         print('保存配置成功')
 
-    # 程序说明函数
-    @staticmethod
-    def about():
-        root = tkinter.Tk()
-        root.title(version)
-        root.configure(bg='white')  # 设置窗体背景颜色
-
-        curwidth = 550
-        curhight = 350
-        scn_w, scn_h = root.maxsize()
-        cen_x = (scn_w - curwidth) / 2
-        cen_y = (scn_h - curhight) / 2
-        size_xy = '%dx%d+%d+%d' % (curwidth, curhight, cen_x, cen_y)
-        root.geometry(size_xy)
-        root.update()  # 设置窗体居中
-
-        t = tkinter.Text(root)
-        t.pack()
-        t.insert("insert", "\n该软件由MD野生科技—信仰之名制作，有问题请关注微信公众号：MD野生科技\n\n"
-                           "或联系邮箱mdwork@163.com\n\n"
-                           "-----------------------------------------------------------------------\n\n"
-                           "该软件为个人开发，耗费大量精力，若您希望软件能持续更新、维护，还请捐赠开发者!\n\n"
-                           "饮水思源，自愿捐赠，不胜感激！虚拟货币钱包地址：\n\n"
-                           "❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤\n"
-                           "XMR(推荐)：\n"
-                           "4AZ8KJr9yXChs2Nk6KEyph5oKWC5oAPU3fWz7oTC6zCoL57oFHeyJm2NhbGx2N4eqDVZh7WbYbWmCjgzTfE5rnCSPqtF4gk\n\n"
-                           "BTC(0.00005个起付)：\n"
-                           "1Kk4f7QDKTGhLgUgDzZhgidUJzFYJdoHgL\n\n"
-                           "ETC(0.01个起付)：\n"
-                           "0xaeefdfd30472d096d23f3a809d3d6bfe95ead0d4\n"
-                           "❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤❤\n\n"
-                           "本次程序运行时长：" + str(runtime - 10) + "秒\n\n")
-        tkinter.Button(root, text=" 关闭 ", command=root.destroy).pack()
-        # root.mainloop()
-
     # 60秒调整一次任务栏窗口，防止长时间不移动主窗体被覆盖
     def windows2(self):
         global runtime
@@ -522,6 +493,60 @@ def resource_path(relative_path):
     else:
         base_path = os.path.abspath(".")
     return os.path.join(base_path, relative_path)
+
+
+# 程序说明函数
+def about():
+    root = tkinter.Toplevel()  # 两个窗口同时存在必须使用这个
+    root.title(version)
+    root.configure(bg='white')  # 设置窗体背景颜色
+    root.iconbitmap(resource_path(r'resources\images\logo.ico'))  # 设置图标，没有图片会报错
+
+    curwidth = 780
+    curhight = 670
+    scn_w, scn_h = root.maxsize()
+    cen_x = (scn_w - curwidth) / 2
+    cen_y = (scn_h - curhight) / 2
+    size_xy = '%dx%d+%d+%d' % (curwidth, curhight, cen_x, cen_y)
+    root.geometry(size_xy)
+    root.update()  # 设置窗体居中
+
+    t = Text(root, font=("微软雅黑", 10), width=600, height=10)
+    t.pack(side='top', expand=YES, fill=BOTH)
+    t.insert("insert",
+             "\n软件由MD野生科技—信仰之名制作，有问题请关注微信公众号：MD野生科技\n"
+             "\n本次程序运行时长：%s秒\n"
+             "\n软件已开源，地址(有可能被墙，请挂梯子访问)：https://github.com/mdmdwork/InfobarTool\n"
+             "\n若您希望软件能持续更新、维护，还请捐赠开发者，饮水思源，自愿捐赠，不胜感激！\n\n"
+             "XMR地址: \n"
+             "4AZ8KJr9yXChs2Nk6KEyph5oKWC5oAPU3fWz7oTC6zCoL57oFHeyJm2NhbGx2N4eqDVZh7WbYbWmCjgzTfE5rnCSPqtF4gk\n\n"
+             "BTC地址: \n"
+             "1Kk4f7QDKTGhLgUgDzZhgidUJzFYJdoHgL\n\n"
+             "ETC地址: \n"
+             "0xaeefdfd30472d096d23f3a809d3d6bfe95ead0d4\n\n"
+             "微信和支付宝二维码(推荐): \n" % str(runtime - 10))
+    t.tag_add("link", "6.23", "6.69")
+    t.tag_config("link", foreground="blue", underline=True)
+    t.tag_add("link2", "2.0", "2.200")
+    t.tag_config("link2", justify="center", font=("黑体", 14))
+    t.tag_add("link3", "8.0", "8.200")
+    t.tag_config("link3", justify="center", font=("微软雅黑", 12, "bold"), foreground="red")
+    t.tag_add("link4", "10.0", "10.200", "13.0", "13.200", "16.0", "16.200", "19.0", "19.200")
+    t.tag_config("link4", font=("微软雅黑", 10, "bold"))
+
+    def click(event):
+        webbrowser.open("https://github.com/mdmdwork/InfobarTool")
+
+    t.tag_bind("link", "<Button-1>", click)
+    f1 = Frame(root, bg='white')
+    photo1 = PhotoImage(file=r'D:\Python\InfobarTool\data\resources\images\wechat.gif')
+    photo2 = PhotoImage(file=r'D:\Python\InfobarTool\data\resources\images\alipay.gif')
+    p1 = Label(f1, image=photo1, width=250, height=250, bg='white')
+    p2 = Label(f1, image=photo2, width=250, height=250, bg='white')
+    f1.pack(side='top')
+    p1.pack(side='left', padx=60, pady=10)
+    p2.pack(side='left', padx=60, pady=10)
+    root.mainloop()
 
 
 # 白底黑字模式函数
@@ -594,10 +619,11 @@ def zcm():
         # 创建主窗口
         root = tkinter.Tk()
         root.title("初次启动验证")
+        root.configure(bg='white')  # 设置窗体背景颜色
         root.iconbitmap(resource_path(r'resources\images\logo.ico'))  # 设置图标，没有图片会报错
 
-        curwidth = 400
-        curhight = 200
+        curwidth = 600
+        curhight = 400
         scn_w, scn_h = root.maxsize()
         cen_x = (scn_w - curwidth) / 2
         cen_y = (scn_h - curhight) / 2
@@ -605,7 +631,7 @@ def zcm():
         root.geometry(size_xy)
         root.update()  # 窗体居中
 
-        def zcm_def():
+        def zcm_def(ev=None):
             global code_pd
             result1 = e1.get()
             if str(result1) != code_jm:
@@ -620,19 +646,21 @@ def zcm():
                 root.destroy()
                 code_pd = str(result1)
 
-        l1 = Label(root, text="获取此软件更新请关注微信公众号：MD野生科技", font=('微软雅黑', 12), padx=0, pady=10, width=0, height=0)
-        l1.pack(side='top')
-        l2 = Label(root, text="请在下部文本框中手动输入微信公众号名称", font=('微软雅黑', 12), padx=0, pady=10, width=0, height=0)
-        l2.pack(side='top')
-
-        f1 = Frame(root)
-        l2 = Label(f1, text="验证口令:", font=('微软雅黑', 12), padx=0, pady=0, borderwidth=0, width=0, height=0)
-        e1 = Entry(f1, font=('微软雅黑', 12))
-        f1.pack(side='top', expand=YES, fill=BOTH)
-        l2.pack(side='left', padx=5)
-        e1.pack(side='left', padx=10, expand=YES, fill=X)
-
+        l1 = Label(root, text="获取此软件更新请关注微信公众号：MD野生科技", font=('微软雅黑', 15, 'bold'), padx=0, pady=20, width=0, height=0, bg='white')
+        photo = PhotoImage(file=resource_path(r'resources\images\MD_logo.gif'))
+        p1 = Label(root, image=photo, width=200, height=200, bg='white')
+        l2 = Label(root, text="请在下方文本框中手动输入微信公众号名称", font=('微软雅黑', 14), padx=0, pady=10, width=0, height=0, bg='white')
+        f1 = Frame(root, bg='white')
+        l3 = Label(f1, text="验证口令:", font=('微软雅黑', 15), padx=0, pady=0, borderwidth=0, width=0, height=0, bg='white')
+        e1 = Entry(f1, font=('微软雅黑', 15), bg='white')
+        e1.bind("<Return>", zcm_def)  # 监听回车键
         b1 = Button(root, text='确定', font=('微软雅黑', 12), width=5, height=1, command=zcm_def)
+        l1.pack(side='top')
+        p1.pack(side='top')
+        l2.pack(side='top')
+        f1.pack(side='top', expand=YES, fill=BOTH)
+        l3.pack(side='left', padx=5)
+        e1.pack(side='right', padx=10, expand=YES, fill=X)
         b1.pack(pady=10)
         root.mainloop()
         return 0
@@ -645,10 +673,11 @@ if __name__ == '__main__':
         print('程序已启动')
         root1 = tkinter.Tk()
         root1.withdraw()
+        root1.iconbitmap(resource_path(r'resources\images\logo.ico'))  # 设置图标，没有图片会报错
         messagebox.showinfo("打开失败", "程序已启动，请关闭或检查当前已启动的程序")
         sys.exit()
     # 初始化变量
-    version = "InfobarTool_v1.0.2"
+    version = "InfobarTool_v1.0.3"
     code_jm = "MD野生科技"
     code_pd = linecache.getline("register.ini", 1).strip('\n')
     linecache.clearcache()

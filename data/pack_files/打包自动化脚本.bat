@@ -1,8 +1,8 @@
 @echo off
 :用spec文件打包
-cmd /k pyinstaller --clean InfobarTool_all.spec --workpath D:\Python\InfobarTool\pack\tmp --distpath D:\Python\InfobarTool\pack
+cmd /k pyinstaller --clean InfobarTool_all.spec --workpath D:\Python\InfobarTool\pack\tmp --distpath D:\Python\InfobarTool\pack --upx-dir=D:\Python\upx\upx-3.96-win32
 :直接打包
-:cmd /k pyinstaller -F -w -i D:\Python\InfobarTool\data\resources\images\logo.ico D:\Python\InfobarTool\data\InfobarTool.pyw --version-file=file_version_info.txt --upx-dir=D:\Python\upx\upx-3.96-win64 --workpath D:\Python\InfobarTool\pack\tmp --distpath D:\Python\InfobarTool\pack
+:cmd /k pyinstaller -F -w -i D:\Python\InfobarTool\data\resources\images\logo.ico D:\Python\InfobarTool\data\InfobarTool.pyw --version-file=file_version_info.txt --upx-dir=D:\Python\upx\upx-3.96-win32 --workpath D:\Python\InfobarTool\pack\tmp --distpath D:\Python\InfobarTool\pack
 
 单文件版：
 pyinstaller -F -w -i logo.ico InfobarTool.pyw
@@ -33,5 +33,5 @@ pyinstaller -F -w -i D:\Python\InfobarTool\data\resources\images\logo.ico D:\Pyt
 –-distpath	指定打包后的程序存放目录，默认存放在当前目录下的dist目录
 –-workpath	为输出的所有临时文件指定存放目录
 --version-file=file_version_info.txt	指定版本文件所在路径
---upx-dir=D:\Python\upx\upx-3.96-win64	指定upx使用目录
+--upx-dir=D:\Python\upx\upx-3.96-win32	指定upx使用目录
 
