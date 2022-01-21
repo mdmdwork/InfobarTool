@@ -210,7 +210,7 @@ class InfobarTool(tkinter.Tk):
                 high_btc = "%.0f" % float(data_list[6])
                 low_btc = "%.0f" % float(data_list[7])
                 base_btc = "%.1f" % float(data_list[5])
-                print(buy_btc + " " + high_btc + " " + low_btc + " " + base_btc)
+                # print(buy_btc + " " + high_btc + " " + low_btc + " " + base_btc)
 
                 # 测试专用
                 # buy_btc = "%.1f" % float(45000)
@@ -329,17 +329,10 @@ class InfobarTool(tkinter.Tk):
         menubar.add_separator()  # 添加菜单横线
         menubar.add_cascade(label="恢复默认", menu=fmenu2)
         menubar.add_cascade(label="程序说明", command=about)
-        menubar.add_cascade(label="关闭程序", command=self.app_quit, background='#C8C8C8')
+        menubar.add_cascade(label="关闭程序", command=app_quit, background='#C8C8C8')
 
-        menubar.post(event.x_root - 65, event.y_root - 30)
+        menubar.post(event.x_root - 65, event.y_root - 50)
         print('右键菜单点击')
-
-    # 退出函数，还原之前的状态栏窗口大小
-    def app_quit(self):
-        win32gui.MoveWindow(win32gui.FindWindowEx(win32gui.FindWindowEx(win32gui.FindWindow(
-            "Shell_TrayWnd", None), 0, "ReBarWindow32", None), 0, "MSTaskSwWClass", None),
-            0, 0, b[2] - b[0] - d1_shiftx, b[3] - b[1], True)  # 还原任务栏
-        self.quit()
 
     # 是否选中判断
     def sz_pd(self):
@@ -486,6 +479,14 @@ class InfobarTool(tkinter.Tk):
         self.after(60000, self.windows2)
 
 
+# 退出函数，还原之前的状态栏窗口大小
+def app_quit():
+    win32gui.MoveWindow(win32gui.FindWindowEx(win32gui.FindWindowEx(win32gui.FindWindow(
+        "Shell_TrayWnd", None), 0, "ReBarWindow32", None), 0, "MSTaskSwWClass", None),
+        0, 0, b[2] - b[0] - d1_shiftx, b[3] - b[1], True)  # 还原任务栏
+    sys.exit()
+
+
 # 定义一个读取相对路径的函数
 def resource_path(relative_path):
     if hasattr(sys, "_MEIPASS"):
@@ -497,40 +498,42 @@ def resource_path(relative_path):
 
 # 程序说明函数
 def about():
-    root = tkinter.Toplevel()  # 两个窗口同时存在必须使用这个
-    root.title(version)
-    root.configure(bg='white')  # 设置窗体背景颜色
-    root.iconbitmap(resource_path(r'resources\images\logo.ico'))  # 设置图标，没有图片会报错
+    root2 = tkinter.Toplevel()  # 两个窗口同时存在必须使用这个
+    root2.title(version)
+    root2.configure(bg='white')  # 设置窗体背景颜色
+    root2.iconbitmap(resource_path(r'resources\images\logo.ico'))  # 设置图标，没有图片会报错
 
-    curwidth = 780
-    curhight = 670
-    scn_w, scn_h = root.maxsize()
+    curwidth = 900
+    curhight = 750
+    scn_w, scn_h = root2.maxsize()
     cen_x = (scn_w - curwidth) / 2
     cen_y = (scn_h - curhight) / 2
     size_xy = '%dx%d+%d+%d' % (curwidth, curhight, cen_x, cen_y)
-    root.geometry(size_xy)
-    root.update()  # 设置窗体居中
+    root2.geometry(size_xy)
+    root2.update()  # 设置窗体居中
 
-    t = Text(root, font=("微软雅黑", 10), width=600, height=10)
+    t = Text(root2, font=("微软雅黑", 10), bg="white")
     t.pack(side='top', expand=YES, fill=BOTH)
     t.insert("insert",
-             "\n软件由MD野生科技—信仰之名制作，有问题请关注微信公众号：MD野生科技\n"
+             "\n软件由MD制作，有问题请关注微信公众号：MD野生科技\n"
              "\n本次程序运行时长：%s秒\n"
              "\n软件已开源，地址(有可能被墙，请挂梯子访问)：https://github.com/mdmdwork/InfobarTool\n"
-             "\n若您希望软件能持续更新、维护，还请捐赠开发者，饮水思源，自愿捐赠，不胜感激！\n\n"
-             "XMR地址: \n"
+             "\n若您希望软件能持续更新、维护，还请打赏开发者，饮水思源，自愿打赏，不胜感激！\n\n"
+             "XMR地址 \n"
              "4AZ8KJr9yXChs2Nk6KEyph5oKWC5oAPU3fWz7oTC6zCoL57oFHeyJm2NhbGx2N4eqDVZh7WbYbWmCjgzTfE5rnCSPqtF4gk\n\n"
-             "BTC地址: \n"
+             "BTC地址 \n"
              "1Kk4f7QDKTGhLgUgDzZhgidUJzFYJdoHgL\n\n"
-             "ETC地址: \n"
+             "ETC地址 \n"
              "0xaeefdfd30472d096d23f3a809d3d6bfe95ead0d4\n\n"
-             "微信和支付宝二维码(推荐): \n" % str(runtime - 60))
+             "微信和支付宝二维码(推荐) \n" % str(runtime - 10))
+    t.tag_add("l", "1.0", "end")
+    t.tag_config("l", justify="center")
     t.tag_add("link", "6.23", "6.69")
     t.tag_config("link", foreground="blue", underline=True)
     t.tag_add("link2", "2.0", "2.200")
-    t.tag_config("link2", justify="center", font=("黑体", 14))
+    t.tag_config("link2", font=("黑体", 15, "bold"))
     t.tag_add("link3", "8.0", "8.200")
-    t.tag_config("link3", justify="center", font=("微软雅黑", 12, "bold"), foreground="red")
+    t.tag_config("link3", font=("微软雅黑", 12, "bold"), foreground="red")
     t.tag_add("link4", "10.0", "10.200", "13.0", "13.200", "16.0", "16.200", "19.0", "19.200")
     t.tag_config("link4", font=("微软雅黑", 10, "bold"))
 
@@ -539,15 +542,16 @@ def about():
         webbrowser.open("https://github.com/mdmdwork/InfobarTool")
 
     t.tag_bind("link", "<Button-1>", click)
-    f1 = Frame(root, bg='white')
-    photo1 = PhotoImage(file=r'D:\Python\InfobarTool\data\resources\images\wechat.gif')
-    photo2 = PhotoImage(file=r'D:\Python\InfobarTool\data\resources\images\alipay.gif')
-    p1 = Label(f1, image=photo1, width=250, height=250, bg='white')
-    p2 = Label(f1, image=photo2, width=250, height=250, bg='white')
-    f1.pack(side='top')
-    p1.pack(side='left', padx=60, pady=10)
-    p2.pack(side='left', padx=60, pady=10)
-    root.mainloop()
+    f1 = Frame(root2, bg='white', pady=20)
+    photo1 = PhotoImage(file=resource_path(r'resources\images\wechat.gif'))
+    photo2 = PhotoImage(file=resource_path(r'resources\images\alipay.gif'))
+    p1 = Label(f1, image=photo1, width=250, height=250)
+    p2 = Label(f1, image=photo2, width=250, height=250)
+    p1.pack(side='left', padx=50)
+    p2.pack(side='left', padx=50)
+    t.window_create("insert", window=f1)
+    root2.mainloop()
+    root2.destroy()
 
 
 # 白底黑字模式函数
@@ -678,7 +682,7 @@ if __name__ == '__main__':
         messagebox.showinfo("打开失败", "程序已启动，请关闭或检查当前已启动的程序")
         sys.exit()
     # 初始化变量
-    version = "InfobarTool_v1.0.4"
+    version = "InfobarTool_v1.0.5"
     code_jm = "MD野生科技"
     code_pd = linecache.getline("register.ini", 1).strip('\n')
     linecache.clearcache()
