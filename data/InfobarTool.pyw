@@ -198,10 +198,10 @@ class InfobarTool(tkinter.Tk):
 
                 if d1_select_if == 1:
                     select_name = 'BTC'
-                    data_list = aa_list[0].replace("var hq_str_btc_btcbtcusd=", "").replace("\"", "").split(",")
+                    data_list = aa_list[1].replace("\"", "").split(",")
                 elif d1_select_if == 2:
                     select_name = 'ETH'
-                    data_list = aa_list[2].replace("var hq_str_btc_btcethusd=", "").replace("\"", "").split(",")
+                    data_list = aa_list[2].replace("\"", "").split(",")
                 else:
                     select_name = '币种出错'
                     data_list = []
@@ -524,7 +524,7 @@ def about():
              "1Kk4f7QDKTGhLgUgDzZhgidUJzFYJdoHgL\n\n"
              "ETC地址: \n"
              "0xaeefdfd30472d096d23f3a809d3d6bfe95ead0d4\n\n"
-             "微信和支付宝二维码(推荐): \n" % str(runtime - 10))
+             "微信和支付宝二维码(推荐): \n" % str(runtime - 60))
     t.tag_add("link", "6.23", "6.69")
     t.tag_config("link", foreground="blue", underline=True)
     t.tag_add("link2", "2.0", "2.200")
@@ -535,6 +535,7 @@ def about():
     t.tag_config("link4", font=("微软雅黑", 10, "bold"))
 
     def click(event):
+        event.num = 0
         webbrowser.open("https://github.com/mdmdwork/InfobarTool")
 
     t.tag_bind("link", "<Button-1>", click)
@@ -677,7 +678,7 @@ if __name__ == '__main__':
         messagebox.showinfo("打开失败", "程序已启动，请关闭或检查当前已启动的程序")
         sys.exit()
     # 初始化变量
-    version = "InfobarTool_v1.0.3"
+    version = "InfobarTool_v1.0.4"
     code_jm = "MD野生科技"
     code_pd = linecache.getline("register.ini", 1).strip('\n')
     linecache.clearcache()
@@ -690,31 +691,38 @@ if __name__ == '__main__':
         sys.exit()
 
     try:
-        d1_shiftx = int(linecache.getline("%s.ini" % version, remove_line[0]).replace(" ", "").strip('\n'))  # 去掉空格，去换行符
-        d1_bg_color = linecache.getline("%s.ini" % version, remove_line[1]).replace(" ", "").strip('\n')
-        d1_word_color = linecache.getline("%s.ini" % version, remove_line[2]).replace(" ", "").strip('\n')
-        d1_bgtm_if = int(linecache.getline("%s.ini" % version, remove_line[3]).replace(" ", "").strip('\n'))
-        d1_frm3 = int(linecache.getline("%s.ini" % version, remove_line[4]).replace(" ", "").strip('\n'))
-        d1_select_if = int(linecache.getline("%s.ini" % version, remove_line[5]).replace(" ", "").strip('\n'))
-        d1_Window_width = int(linecache.getline("%s.ini" % version, remove_line[6]).replace(" ", "").strip('\n'))
-        d1_frm1 = int(linecache.getline("%s.ini" % version, remove_line[7]).replace(" ", "").strip('\n'))
-        d1_frm2 = int(linecache.getline("%s.ini" % version, remove_line[8]).replace(" ", "").strip('\n'))
+        file = open("%s.ini" % version, 'r', encoding='utf-8')
+        data1 = file.read().split("\n")  # 以换行符为分割点将数据分割为列表
+        file.close()
+        d1_shiftx = int(data1[remove_line[0] - 1])
+        d1_bg_color = data1[remove_line[1] - 1]
+        d1_word_color = data1[remove_line[2] - 1]
+        d1_bgtm_if = int(data1[remove_line[3] - 1])
+        d1_frm3 = int(data1[remove_line[4] - 1])
+        d1_select_if = int(data1[remove_line[5] - 1])
+        d1_Window_width = int(data1[remove_line[6] - 1])
+        d1_frm1 = int(data1[remove_line[7] - 1])
+        d1_frm2 = int(data1[remove_line[8] - 1])
         d1_shiftx_new = d1_shiftx
+        del data1
 
     except Exception as err:
         print(err)
         restore_w()
-        linecache.clearcache()  # linecach重复读取，不清理的话会直接从缓存中读取
-        d1_shiftx = int(linecache.getline("%s.ini" % version, remove_line[0]).replace(" ", "").strip('\n'))  # 去掉空格，去换行符
-        d1_bg_color = linecache.getline("%s.ini" % version, remove_line[1]).replace(" ", "").strip('\n')
-        d1_word_color = linecache.getline("%s.ini" % version, remove_line[2]).replace(" ", "").strip('\n')
-        d1_bgtm_if = int(linecache.getline("%s.ini" % version, remove_line[3]).replace(" ", "").strip('\n'))
-        d1_frm3 = int(linecache.getline("%s.ini" % version, remove_line[4]).replace(" ", "").strip('\n'))
-        d1_select_if = int(linecache.getline("%s.ini" % version, remove_line[5]).replace(" ", "").strip('\n'))
-        d1_Window_width = int(linecache.getline("%s.ini" % version, remove_line[6]).replace(" ", "").strip('\n'))
-        d1_frm1 = int(linecache.getline("%s.ini" % version, remove_line[7]).replace(" ", "").strip('\n'))
-        d1_frm2 = int(linecache.getline("%s.ini" % version, remove_line[8]).replace(" ", "").strip('\n'))
+        file = open("%s.ini" % version, 'r', encoding='utf-8')
+        data1 = file.read().split("\n")  # 以换行符为分割点将数据分割为列表
+        file.close()
+        d1_shiftx = int(data1[remove_line[0] - 1])
+        d1_bg_color = data1[remove_line[1] - 1]
+        d1_word_color = data1[remove_line[2] - 1]
+        d1_bgtm_if = int(data1[remove_line[3] - 1])
+        d1_frm3 = int(data1[remove_line[4] - 1])
+        d1_select_if = int(data1[remove_line[5] - 1])
+        d1_Window_width = int(data1[remove_line[6] - 1])
+        d1_frm1 = int(data1[remove_line[7] - 1])
+        d1_frm2 = int(data1[remove_line[8] - 1])
         d1_shiftx_new = d1_shiftx
+        del data1
 
     app = InfobarTool()
     app.mainloop()
