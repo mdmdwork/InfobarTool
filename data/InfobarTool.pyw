@@ -4,6 +4,7 @@ import tkinter
 import webbrowser
 from tkinter import *
 from tkinter import messagebox, colorchooser
+from win32con import HKEY_CURRENT_USER, KEY_ALL_ACCESS, REG_SZ
 from requests.adapters import HTTPAdapter
 import psutil
 import requests
@@ -21,15 +22,16 @@ class InfobarTool(tkinter.Tk):
         self.ckjb = 1
         self.new_d1_Window_width = d1_Window_width
         self.net_text_first = psutil.net_io_counters()
-        self.var1 = IntVar(value=d1_bgtm_if)
+        self.var_bgtm = IntVar(value=d1_bgtm_if)
         self.select = IntVar(value=d1_select_if)
+        self.var_autokey = IntVar(value=d1_autokey)
 
         self.var_frm1 = IntVar(value=d1_frm1)
         self.var_frm2 = IntVar(value=d1_frm2)
         self.var_frm3 = IntVar(value=d1_frm3)
 
         self.title(version)
-        # self.iconbitmap('logo.ico')  # 设置左上角图标，没有图片会报错
+        # self.iconbitmap(r'D:\Python\InfobarTool\data\resources\images\logo.ico')  # 设置左上角图标，没有图片会报错
         self.geometry("-5000-5000")  # 例子：160x100+900+300，160x100为设置窗口尺寸，+900+300为设置窗口位置
         # self.geometry("182x40+500+500")
         if d1_bgtm_if == 1:
@@ -272,7 +274,7 @@ class InfobarTool(tkinter.Tk):
             elif d1_Window_width != self.new_d1_Window_width:
                 d1_Window_width = self.new_d1_Window_width
                 Refresh(self.ckjb)
-                self.save()
+                save()
 
             else:
                 pass
@@ -286,7 +288,7 @@ class InfobarTool(tkinter.Tk):
         fmenu1 = Menu(self, tearoff=0)
         fmenu1.add_cascade(label="选择字体颜色", command=self.d1_word_color_diy)
         fmenu1.add_cascade(label="选择背景颜色", command=self.d1_bg_color_diy)
-        fmenu1.add_checkbutton(label="透明背景", command=self.d1_bgtm_if_def, variable=self.var1)
+        fmenu1.add_checkbutton(label="透明背景", command=self.d1_bgtm_if_def, variable=self.var_bgtm)
         fmenu2 = Menu(self, tearoff=0)
         fmenu2.add_cascade(label="白底黑字", command=restore_b, background='#FFFFFF', foreground='#383838')
         fmenu2.add_cascade(label="黑底白字", command=restore_w, background='#383838', foreground='#FFFFFF')
@@ -314,19 +316,15 @@ class InfobarTool(tkinter.Tk):
             fmenu5.add_radiobutton(label=s_l, command=self.sz_pd, variable=self.var_frm2, value=num)
             fmenu6.add_radiobutton(label=s_l, command=self.sz_pd, variable=self.var_frm3, value=num)
 
-        # fmenu4 = Menu(self, tearoff=0)
-        # fmenu4.add_checkbutton(label="实时价格", command=self.sz_pd, variable=self.var2)
-        # fmenu4.add_checkbutton(label="24H峰值", command=self.sz_pd, variable=self.var3)
-        # fmenu4.add_checkbutton(label="网速显示", command=self.sz_pd, variable=self.var4)
-
         menubar = Menu(self, tearoff=0)  # tearoff=0表示取消菜单独立，无横线
-        menubar.add_cascade(label="币种选择", menu=fmenu3)
-        menubar.add_cascade(label="配色修改", menu=fmenu1)
         menubar.add_cascade(label="第一功能区", menu=fmenu4)
         menubar.add_cascade(label="第二功能区", menu=fmenu5)
         menubar.add_cascade(label="第三功能区", menu=fmenu6)
-        menubar.add_cascade(label="移动此工具位置", command=self.move_position)
+        menubar.add_cascade(label="币种选择", menu=fmenu3)
+        menubar.add_cascade(label="配色修改", menu=fmenu1)
+        menubar.add_cascade(label="移动显示位置", command=self.move_position)
         menubar.add_separator()  # 添加菜单横线
+        menubar.add_checkbutton(label="开机启动", command=autorun, variable=self.var_autokey)
         menubar.add_cascade(label="恢复默认", menu=fmenu2)
         menubar.add_cascade(label="程序说明", command=about)
         menubar.add_cascade(label="关闭程序", command=app_quit, background='#C8C8C8')
@@ -352,7 +350,7 @@ class InfobarTool(tkinter.Tk):
             self.var_frm3.set(3)
             self.new_d1_Window_width = 70
             messagebox.showinfo(version, "不支持功能全关，已自动帮你打开仅显示网速模式\n\n另外：若是因修改配置文件导致该情况，重启即可恢复正常")
-            self.save()
+            save()
         if list_frm.count(0) == 2:
             self.new_d1_Window_width = 70
         if list_frm.count(0) == 1:
@@ -364,7 +362,7 @@ class InfobarTool(tkinter.Tk):
         d1_frm1 = self.var_frm1.get()
         d1_frm2 = self.var_frm2.get()
         d1_frm3 = self.var_frm3.get()
-        self.save()
+        save()
 
     # 透明/有色背景判断函数
     def d1_bgtm_if_def(self):
@@ -372,13 +370,12 @@ class InfobarTool(tkinter.Tk):
         if d1_word_color == d1_bg_color:  # 防止背景和字体颜色相同
             messagebox.showwarning("警告", "背景和字体颜色不能相同")
         else:
-            if d1_bgtm_if == 1:
+            if self.var_bgtm.get() == 0:
                 self.wm_attributes('-transparentcolor', '#796969')  # 将#796969色设置透明
-                d1_bgtm_if = 0
-            else:
+            if self.var_bgtm.get() == 1:
                 self.wm_attributes('-transparentcolor', d1_bg_color)  # 将d1_bg_color设置透明
-                d1_bgtm_if = 1
-        self.save()
+        d1_bgtm_if = self.var_bgtm.get()
+        save()
 
     # 字体颜色自定义函数
     def d1_word_color_diy(self):
@@ -393,7 +390,7 @@ class InfobarTool(tkinter.Tk):
         self.l4.config(fg=d1_word_color)
         self.l5.config(fg=d1_word_color)
         self.l6.config(fg=d1_word_color)
-        self.save()
+        save()
 
     # 背景颜色自定义函数
     def d1_bg_color_diy(self):
@@ -412,55 +409,34 @@ class InfobarTool(tkinter.Tk):
         self.l4.config(bg=d1_bg_color)
         self.l5.config(bg=d1_bg_color)
         self.l6.config(bg=d1_bg_color)
-        d1_bgtm_if = 0
-        self.save()
+        self.var_bgtm.set(0)
+        save()
 
     # 移动滑块函数
-    def move_position(self):
+    @staticmethod
+    def move_position():
         def show(val):
             global d1_shiftx_new
             d1_shiftx_new = int(val)
 
         def close():
-            self.save()
-            root.destroy()
+            save()
+            movewindow.destroy()
 
-        root = Tk()
-        root.geometry("+" + str(b[2] - b[0] - (int(d1_Window_width / 1.8)) - d1_shiftx) + "+" + str(b[1] - 150))
-        root.resizable(width=False, height=False)  # 给窗口设置横轴竖轴的可缩放性
-        root.overrideredirect(True)  # 隐藏窗口边框和任务栏图标
-        root.wm_attributes('-alpha', 0.7)  # 设置窗口透明度
+        movewindow = Tk()
+        movewindow.geometry("+" + str(b[2] - b[0] - (int(d1_Window_width / 1.8)) - d1_shiftx) + "+" + str(b[1] - 150))
+        movewindow.resizable(width=False, height=False)  # 给窗口设置横轴竖轴的可缩放性
+        movewindow.overrideredirect(True)  # 隐藏窗口边框和任务栏图标
+        movewindow.wm_attributes('-alpha', 0.7)  # 设置窗口透明度
 
-        l1 = Label(root, text="  拖动滑块改变位置  ", font=('微软雅黑', 12, 'bold'))
+        l1 = Label(movewindow, text="  拖动滑块改变位置  ", font=('微软雅黑', 12, 'bold'))
         l1.pack()
-        s1 = Scale(root, orient='horizontal', activebackground='red', troughcolor='#0080FF', font=('微软雅黑', 10),
+        s1 = Scale(movewindow, orient='horizontal', activebackground='red', troughcolor='#0080FF', font=('微软雅黑', 10),
                    sliderlength=20, sliderrelief='flat', relief='ridge', resolution=1, from_=0, to=500, length=200,
                    command=show)
         s1.set(d1_shiftx)
         s1.pack()
-        Button(root, text="关闭", font=('微软雅黑', 10, 'bold'), activeforeground='#0080FF', command=close).pack()
-
-    # 保存当前配置
-    @staticmethod
-    def save():
-        in_file = open("%s.ini" % version, 'r', encoding='utf-8')
-        out_file = open("%s.ini" % version, 'r+', encoding='utf-8')
-        index = 0
-
-        dict_line = {4: d1_shiftx, 7: d1_bg_color, 10: d1_word_color, 13: d1_bgtm_if, 16: d1_frm3, 19: d1_select_if,
-                     22: d1_Window_width,
-                     25: d1_frm1, 28: d1_frm2}
-
-        for line in in_file:
-            index = index + 1
-            if index in remove_line:
-                out_file.write(str(dict_line[index]) + "\n")
-            if index not in remove_line:
-                out_file.write(line)
-
-        in_file.close()
-        out_file.close()
-        print('保存配置成功')
+        Button(movewindow, text="关闭", font=('微软雅黑', 10, 'bold'), activeforeground='#0080FF', command=close).pack()
 
     # 60秒调整一次任务栏窗口，防止长时间不移动主窗体被覆盖
     def windows2(self):
@@ -477,6 +453,27 @@ class InfobarTool(tkinter.Tk):
             print('程序运行时间:' + str(runtime) + '秒\n' + str(err3))
         runtime = runtime + 60
         self.after(60000, self.windows2)
+
+
+# 保存当前配置
+def save():
+    in_file = open(resource_path("%s.ini" % version), 'r', encoding='utf-8')
+    out_file = open(resource_path("%s.ini" % version), 'r+', encoding='utf-8')
+    index = 0
+
+    dict_line = {4: d1_shiftx, 7: d1_bg_color, 10: d1_word_color, 13: d1_bgtm_if, 16: d1_frm3, 19: d1_select_if,
+                 22: d1_Window_width, 25: d1_frm1, 28: d1_frm2, 31: d1_autokey}
+
+    for line in in_file:
+        index = index + 1
+        if index in remove_line:
+            out_file.write(str(dict_line[index]) + "\n")
+        if index not in remove_line:
+            out_file.write(line)
+
+    in_file.close()
+    out_file.close()
+    print('保存配置成功')
 
 
 # 退出函数，还原之前的状态栏窗口大小
@@ -525,7 +522,7 @@ def about():
              "1Kk4f7QDKTGhLgUgDzZhgidUJzFYJdoHgL\n\n"
              "ETC地址 \n"
              "0xaeefdfd30472d096d23f3a809d3d6bfe95ead0d4\n\n"
-             "微信和支付宝二维码(推荐) \n" % str(runtime - 10))
+             "微信和支付宝二维码(推荐) \n" % str(runtime - 60))
     t.tag_add("l", "1.0", "end")
     t.tag_config("l", justify="center")
     t.tag_add("link", "6.23", "6.69")
@@ -557,8 +554,8 @@ def about():
 # 白底黑字模式函数
 def restore_b():
     # dict_line = {7: '#d5d5d5', 10: '#2b2b2b'}
-    in_file = open("%s.ini" % version, 'r', encoding='utf-8')
-    out_file = open("%s.ini" % version, 'r+', encoding='utf-8')
+    in_file = open(resource_path("%s.ini" % version), 'r', encoding='utf-8')
+    out_file = open(resource_path("%s.ini" % version), 'r+', encoding='utf-8')
     index = 0
     dict_line = {7: '#d5d5d5', 10: '#2b2b2b'}
 
@@ -577,8 +574,8 @@ def restore_b():
 
 # 黑底白字模式函数
 def restore_w():
-    out_file = open("%s.ini" % version, 'w+', encoding='utf-8')
-    r_w = ['这是配置文件，请勿胡乱修改！若因修改此文件导致软件异常，请恢复默认文件！',
+    out_file = open(resource_path("%s.ini" % version), 'w+', encoding='utf-8')
+    r_w = ['这是配置文件，请勿胡乱修改！若因修改此文件导致软件异常，请删除本文件并重启！',
            '-------------------------------------------------------------',
            '##插入窗口距托盘区距离##d1_shiftx = ',
            '62',
@@ -606,7 +603,10 @@ def restore_w():
            '-----------------------------',
            '##第二功能区##d1_frm2 =',
            '4',
-           '-----------------------------'
+           '-----------------------------',
+           '##开机自动启动##d1_autokey =',
+           '0',
+           '-----------------------------',
            ]
     for line in r_w:
         out_file.write(line + "\n")
@@ -645,7 +645,7 @@ def zcm():
                 # sys.exit()
 
             if str(result1) == code_jm:
-                out_file = open("register.ini", 'w+', encoding='utf-8')
+                out_file = open(resource_path("register.ini"), 'w+', encoding='utf-8')
                 out_file.write(str(result1))
                 out_file.close()
                 root.destroy()
@@ -654,7 +654,7 @@ def zcm():
         l1 = Label(root, text="获取此软件更新请关注微信公众号：MD野生科技", font=('微软雅黑', 15, 'bold'), padx=0, pady=20, width=0, height=0, bg='white')
         photo = PhotoImage(file=resource_path(r'resources\images\MD_logo.gif'))
         p1 = Label(root, image=photo, width=200, height=200, bg='white')
-        l2 = Label(root, text="请在下方文本框中手动输入微信公众号名称", font=('微软雅黑', 14), padx=0, pady=10, width=0, height=0, bg='white')
+        l2 = Label(root, text="请在下方文本框中手动输入：MD野生科技", font=('微软雅黑', 14), padx=0, pady=10, width=0, height=0, bg='white')
         f1 = Frame(root, bg='white')
         l3 = Label(f1, text="验证口令:", font=('微软雅黑', 15), padx=0, pady=0, borderwidth=0, width=0, height=0, bg='white')
         e1 = Entry(f1, font=('微软雅黑', 15), bg='white')
@@ -671,6 +671,33 @@ def zcm():
         return 0
 
 
+# 开机自启动注册表修改函数
+def autorun():
+    global d1_autokey
+    name = 'InfobarTool'  # 要添加的项值名称
+    path = resource_path(r'InfobarTool.exe')  # 要添加的exe路径
+    runpath = r'Software\Microsoft\Windows\CurrentVersion\Run'  # 注册表路径
+    if app.var_autokey.get() == 1:
+        try:
+            key = win32api.RegOpenKey(HKEY_CURRENT_USER, runpath, 0, KEY_ALL_ACCESS)
+            win32api.RegSetValueEx(key, name, 0, REG_SZ, path)
+            win32api.RegCloseKey(key)
+            messagebox.showinfo('提示', '开机启动注册表添加成功！')
+        except Exception as erro:
+            messagebox.showinfo('提示', '开机启动注册表添加失败！\n'+str(erro))
+
+    if app.var_autokey.get() == 0:
+        try:
+            key = win32api.RegOpenKey(HKEY_CURRENT_USER, runpath, 0, KEY_ALL_ACCESS)
+            win32api.RegDeleteValue(key, name)
+            win32api.RegCloseKey(key)
+            messagebox.showinfo('提示', '开机启动注册表已删除！')
+        except Exception as erro:
+            messagebox.showinfo('提示', '开机启动注册表删除失败！\n'+str(erro))
+    d1_autokey = app.var_autokey.get()
+    save()
+
+
 if __name__ == '__main__':
     # 重复启动验证
     mutex = win32event.CreateMutex(None, False, 'InfobarTool_is_Running')
@@ -682,11 +709,11 @@ if __name__ == '__main__':
         messagebox.showinfo("打开失败", "程序已启动，请关闭或检查当前已启动的程序")
         sys.exit()
     # 初始化变量
-    version = "InfobarTool_v1.0.5"
+    version = "InfobarTool_v1.0.6"
     code_jm = "MD野生科技"
-    code_pd = linecache.getline("register.ini", 1).strip('\n')
+    code_pd = linecache.getline(resource_path("register.ini"), 1).strip('\n')
     linecache.clearcache()
-    remove_line = [4, 7, 10, 13, 16, 19, 22, 25, 28]
+    remove_line = [4, 7, 10, 13, 16, 19, 22, 25, 28, 31]
     b = win32gui.GetWindowRect(win32gui.FindWindowEx(win32gui.FindWindow("Shell_TrayWnd", None), 0, "ReBarWindow32", None))
     runtime = 0  # 程序运行起始时间
 
@@ -695,7 +722,7 @@ if __name__ == '__main__':
         sys.exit()
 
     try:
-        file = open("%s.ini" % version, 'r', encoding='utf-8')
+        file = open(resource_path("%s.ini" % version), 'r', encoding='utf-8')
         data1 = file.read().split("\n")  # 以换行符为分割点将数据分割为列表
         file.close()
         d1_shiftx = int(data1[remove_line[0] - 1])
@@ -707,13 +734,14 @@ if __name__ == '__main__':
         d1_Window_width = int(data1[remove_line[6] - 1])
         d1_frm1 = int(data1[remove_line[7] - 1])
         d1_frm2 = int(data1[remove_line[8] - 1])
+        d1_autokey = int(data1[remove_line[9] - 1])
         d1_shiftx_new = d1_shiftx
         del data1
 
     except Exception as err:
         print(err)
         restore_w()
-        file = open("%s.ini" % version, 'r', encoding='utf-8')
+        file = open(resource_path("%s.ini" % version), 'r', encoding='utf-8')
         data1 = file.read().split("\n")  # 以换行符为分割点将数据分割为列表
         file.close()
         d1_shiftx = int(data1[remove_line[0] - 1])
@@ -725,6 +753,7 @@ if __name__ == '__main__':
         d1_Window_width = int(data1[remove_line[6] - 1])
         d1_frm1 = int(data1[remove_line[7] - 1])
         d1_frm2 = int(data1[remove_line[8] - 1])
+        d1_autokey = int(data1[remove_line[9] - 1])
         d1_shiftx_new = d1_shiftx
         del data1
 
