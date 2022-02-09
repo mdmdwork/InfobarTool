@@ -1,17 +1,15 @@
-import os
-import sys
-import tkinter
-from tkinter import messagebox
+import win32gui
 
-# 定义一个读取相对路径的函数
-def resource_path(relative_path):
-    if hasattr(sys, "_MEIPASS"):
-        base_path = sys._MEIPASS
-    else:
-        base_path = os.path.abspath(".")
-    return os.path.join(base_path, relative_path)
+# 将MSTaskSwWClass缩小[数字分别表示该窗口的左侧/顶部/右侧/底部坐标]，预留窗口位置
+m_htaskbar = win32gui.FindWindow("Shell_TrayWnd", None)
+m_hbar = win32gui.FindWindowEx(m_htaskbar, 0, "ReBarWindow32", None)
+m_hmin = win32gui.FindWindowEx(m_hbar, 0, "MSTaskSwWClass", None)
 
-root = tkinter.Tk()
-root.withdraw()
-root.iconbitmap(r'D:\Python\InfobarTool\data\resources\images\logo.ico')  # 设置图标，没有图片会报错
-messagebox.showinfo('1', '2')
+bm_hmin = win32gui.GetWindowRect(m_hmin)
+bm_hbar = win32gui.GetWindowRect(m_hbar)
+bm_htaskbar = win32gui.GetWindowRect(m_htaskbar)
+print(bm_htaskbar)
+print(bm_hbar)
+print(bm_hmin)
+
+

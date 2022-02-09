@@ -18,6 +18,7 @@ import os
 class InfobarTool(tkinter.Tk):
     def __init__(self):
         super().__init__()
+        self.d = None
         self.ckjb_i = 1
         self.ckjb = 1
         self.new_d1_Window_width = d1_Window_width
@@ -33,7 +34,7 @@ class InfobarTool(tkinter.Tk):
         self.title(version)
         # self.iconbitmap(r'D:\Python\InfobarTool\data\resources\images\logo.ico')  # 设置左上角图标，没有图片会报错
         self.geometry("-5000-5000")  # 例子：160x100+900+300，160x100为设置窗口尺寸，+900+300为设置窗口位置
-        # self.geometry("182x40+500+500")
+        # self.geometry("182x40-1000+500")
         if d1_bgtm_if == 1:
             self.wm_attributes('-transparentcolor', d1_bg_color)  # 将d1_bg_color设置透明
         else:
@@ -82,7 +83,6 @@ class InfobarTool(tkinter.Tk):
         self.net()
         self.cpu_mem()
         self.window_to_taskbar()
-        self.windows2()
 
     # tkinter控件显示逻辑
     def tk_show(self, function, text_v1, text_v2, font_v1, font_v2):
@@ -137,37 +137,39 @@ class InfobarTool(tkinter.Tk):
 
     # 网速信息获取
     def net(self):
+        global runtime
         if 3 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:  # 首先先判断是否需要显示网速
             def formatnum(size):
-                ds = ['', 'k', 'm', 'g', 't']
+                ds = ['', 'K', 'M', 'G', 'T']
                 for d in ds:
                     if size < 1000:
                         if d:
-                            return str(size) + d + "/s"
+                            return str(size) + d
                         else:
-                            return f'{round(size / 1024, 1)}k/s'
+                            return f'{round(size / 1024, 1)}K'
                     size = round(size / 1024, 1)
-                return '0b/s'
+                return '0B'
 
             net0 = self.net_text_first
             net1 = psutil.net_io_counters()
-            net_sent = '⇡%s' % formatnum((net1.bytes_sent - net0.bytes_sent) * 1)
-            net_recv = '⇣%s' % formatnum((net1.bytes_recv - net0.bytes_recv) * 1)
+            net_sent = '上:%s' % formatnum((net1.bytes_sent - net0.bytes_sent) * 1)
+            net_recv = '下:%s' % formatnum((net1.bytes_recv - net0.bytes_recv) * 1)
             self.net_text_first = psutil.net_io_counters()
             self.tk_show(3, net_sent, net_recv, 0, 0)
+            runtime += 1
         else:
-            pass
-        self.after(995, self.net)  # 考虑程序执行延迟采用995毫秒
+            runtime += 1
+        self.after(998, self.net)  # 考虑程序执行延迟采用998毫秒
 
     # cpu和内存占用信息获取
     def cpu_mem(self):
         if 4 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
-            cpu = f"CPU%04.1f%%" % psutil.cpu_percent()  # 规定显示位数，不够用0占位
-            mem = f"内存%04.1f%%" % psutil.virtual_memory().percent
+            cpu = f"核:%04.1f%%" % psutil.cpu_percent()  # 规定显示位数，不够用0占位
+            mem = f"内:%04.1f%%" % psutil.virtual_memory().percent
             # cpu = f"CPU{psutil.cpu_percent()}%"
             # mem = f"内存{psutil.virtual_memory().percent}%"
             self.tk_show(4, cpu, mem, 0, 0)
-        self.after(995, self.cpu_mem)
+        self.after(998, self.cpu_mem)
 
     # 虚拟货币实时价格信息获取
     def update_btcdata(self):
@@ -223,9 +225,9 @@ class InfobarTool(tkinter.Tk):
                 add_btc = "%+.1f%%" % (((float(buy_btc) - float(base_btc)) / float(base_btc)) * 100)
 
                 if 1 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
-                    self.tk_show(1, (select_name + ' ' + add_btc), ('$ ' + buy_btc), 0, 0)
+                    self.tk_show(1, (select_name+add_btc), ('$' + buy_btc), 0, 0)
                 if 2 in [self.var_frm1.get(), self.var_frm2.get(), self.var_frm3.get()]:
-                    self.tk_show(2, ('⇡' + high_btc), ('⇣' + low_btc), 0, 0)
+                    self.tk_show(2, ('高:' + high_btc), ('低:' + low_btc), 0, 0)
             else:
                 print("单机模式，虚拟币数据已暂停获取")
                 pass
@@ -242,13 +244,31 @@ class InfobarTool(tkinter.Tk):
         global d1_Window_width, b, d1_shiftx, d1_shiftx_new
 
         def Refresh(zck):
-            win32gui.MoveWindow(m_hmin, 0, 0, b[2] - b[0] - d1_Window_width - d1_shiftx, b[3] - b[1],
-                                True)  # 将MSTaskSwWClass缩小[x位置，y位置，宽，高]，预留窗口位置
-            win32gui.SetParent(zck, m_hbar)  # 设置任务栏m_hBar为此窗口的父窗口
-            appx = str(b[2] - b[0] - d1_Window_width - d1_shiftx)
-            widthy = b[3] - b[1]  # 插入窗口的高
-            app.geometry(str(d1_Window_width) + 'x' + str(widthy) + '+' + appx + '+0')
-            print('窗口移动成功')
+            global b
+            if sys.getwindowsversion().build >= 22000:  # win11的内部版本号大于22000
+                # 此判断目的是为了适配win11状态栏
+                win32gui.SetParent(zck, m_hbar)  # 设置任务栏m_hBar为此窗口的父窗口
+                if d1_shiftx > 500:  # 设置最右侧距离限制，否则重启软件会因为b数组变化出现显示位置错误
+                    app.geometry(str(d1_Window_width) + 'x' + str(b[3] - b[1]) + '+' + str(d1_shiftx-500) + '+0')
+                else:
+                    appx = str(b[2] - b[0] - d1_Window_width - d1_shiftx)
+                    app.geometry(str(d1_Window_width) + 'x' + str(b[3] - b[1]) + '+' + appx + '+0')
+                    # 例子：160x100+X+Y，160x100为设置窗口尺寸，+X+Y为设置窗口位置，其中：
+                    # +X表示距屏幕左边的距离X;-X表示距屏幕右边的距离X;+Y表示距屏幕上边的距离Y;-Y表示距屏幕下边的距离Y
+                print('窗口移动成功(win11)')
+            else:
+                if d1_shiftx > 500:  # 设置最右侧距离限制，否则重启软件会因为b数组变化出现显示位置错误
+                    # 将MSTaskSwWClass缩小[数字分别表示该窗口的左侧/顶部/右侧/底部坐标]，预留窗口位置，防止窗口被覆盖(对win11系统无效)
+                    win32gui.MoveWindow(m_hmin, 0, 0, b[2] - b[0], b[3] - b[1], True)
+                    win32gui.SetParent(zck, m_hbar)  # 设置任务栏m_hBar为此窗口的父窗口
+                    app.geometry(str(d1_Window_width) + 'x' + str(b[3] - b[1]) + '+' + str(d1_shiftx - 500) + '+0')
+                else:
+                    # 将MSTaskSwWClass缩小[数字分别表示该窗口的左侧/顶部/右侧/底部坐标]，预留窗口位置，防止窗口被覆盖(对win11系统无效)
+                    win32gui.MoveWindow(m_hmin, 0, 0, b[2] - b[0] - d1_Window_width - d1_shiftx, b[3] - b[1], True)
+                    win32gui.SetParent(zck, m_hbar)  # 设置任务栏m_hBar为此窗口的父窗口
+                    appx = str(b[2] - b[0] - d1_Window_width - d1_shiftx)
+                    app.geometry(str(d1_Window_width) + 'x' + str(b[3] - b[1]) + '+' + appx + '+0')
+                print('窗口移动成功(win10)')
             return 0
 
         try:
@@ -257,13 +277,13 @@ class InfobarTool(tkinter.Tk):
             m_hbar = win32gui.FindWindowEx(m_htaskbar, 0, "ReBarWindow32", None)
             m_hmin = win32gui.FindWindowEx(m_hbar, 0, "MSTaskSwWClass", None)
             ckjb_first = win32gui.FindWindow(None, version)  # 获取当前程序的窗口句柄
+            c = win32gui.GetWindowRect(m_hbar)  # 获取m_hBar窗口尺寸为[左，上，右，下]的数组
+            self.d = win32gui.GetWindowRect(m_hmin)  # 获取m_hmin窗口尺寸为[左，上，右，下]的数组
             if int(ckjb_first) != 0 and self.ckjb_i != 0:
                 self.ckjb = ckjb_first
                 self.ckjb_i = Refresh(ckjb_first)
 
-            c = win32gui.GetWindowRect(m_hbar)  # 获取m_hBar窗口尺寸b为[左，上，右，下]的数组
-
-            if c != b:
+            if c != b and d1_shiftx <= 500:  # 如果距托盘区距离超过500则不更新位置
                 b = c
                 Refresh(self.ckjb)
 
@@ -290,8 +310,8 @@ class InfobarTool(tkinter.Tk):
         fmenu1.add_cascade(label="选择背景颜色", command=self.d1_bg_color_diy)
         fmenu1.add_checkbutton(label="透明背景", command=self.d1_bgtm_if_def, variable=self.var_bgtm)
         fmenu2 = Menu(self, tearoff=0)
-        fmenu2.add_cascade(label="白底黑字", command=restore_b, background='#FFFFFF', foreground='#383838')
-        fmenu2.add_cascade(label="黑底白字", command=restore_w, background='#383838', foreground='#FFFFFF')
+        fmenu2.add_cascade(label="白底黑字(重启生效)", command=restore_b, background='#FFFFFF', foreground='#383838')
+        fmenu2.add_cascade(label="黑底白字(重启生效)", command=restore_w, background='#383838', foreground='#FFFFFF')
 
         fmenu3 = Menu(self, tearoff=0)
         select_list = [
@@ -415,44 +435,50 @@ class InfobarTool(tkinter.Tk):
     # 移动滑块函数
     @staticmethod
     def move_position():
-        def show(val):
+        def Show(val):
             global d1_shiftx_new
             d1_shiftx_new = int(val)
 
-        def close():
+        def Reduce():
+            s1.set(s1.get()-1)
+
+        def Add():
+            s1.set(s1.get()+1)
+
+        def Left():
+            s1.set(501)
+
+        def Right():
+            s1.set(0)
+
+        def Close():
             save()
             movewindow.destroy()
 
         movewindow = Tk()
-        movewindow.geometry("+" + str(b[2] - b[0] - (int(d1_Window_width / 1.8)) - d1_shiftx) + "+" + str(b[1] - 150))
-        movewindow.resizable(width=False, height=False)  # 给窗口设置横轴竖轴的可缩放性
+        if d1_shiftx >= 501:
+            movewindow.geometry("+" + str(d1_shiftx - 500) + "+" + str(b[1] - 200))
+        else:
+            movewindow.geometry("+" + str(b[2] - b[0] - d1_Window_width - d1_shiftx) + "+" + str(b[1] - 200))
+        # movewindow.resizable(width=False, height=False)  # 给窗口设置横轴竖轴的可缩放性
         movewindow.overrideredirect(True)  # 隐藏窗口边框和任务栏图标
-        movewindow.wm_attributes('-alpha', 0.7)  # 设置窗口透明度
+        movewindow.wm_attributes('-alpha', 0.9)  # 设置窗口透明度
+        movewindow.wm_attributes('-topmost', 1)  # 设置窗口置顶
 
         l1 = Label(movewindow, text="  拖动滑块改变位置  ", font=('微软雅黑', 12, 'bold'))
-        l1.pack()
         s1 = Scale(movewindow, orient='horizontal', activebackground='red', troughcolor='#0080FF', font=('微软雅黑', 10),
-                   sliderlength=20, sliderrelief='flat', relief='ridge', resolution=1, from_=0, to=500, length=200,
-                   command=show)
+                   sliderlength=20, sliderrelief='flat', relief='ridge', resolution=1, from_=0, to=1000, length=250,
+                   command=Show)
         s1.set(d1_shiftx)
+        frm1 = Frame(movewindow)
+        Button(frm1, text="最左侧", font=('微软雅黑', 8), command=Left).pack(side='left', padx=10, pady=3)
+        Button(frm1, text="-1", font=('微软雅黑', 8), command=Reduce).pack(side='left', padx=10, pady=3)
+        Button(frm1, text="+1", font=('微软雅黑', 8), command=Add).pack(side='left', padx=10, pady=3)
+        Button(frm1, text="最右侧", font=('微软雅黑', 8), command=Right).pack(side='left', padx=10, pady=3)
+        l1.pack(pady=4)
+        frm1.pack()
         s1.pack()
-        Button(movewindow, text="关闭", font=('微软雅黑', 10, 'bold'), activeforeground='#0080FF', command=close).pack()
-
-    # 60秒调整一次任务栏窗口，防止长时间不移动主窗体被覆盖
-    def windows2(self):
-        global runtime
-        try:
-            m_htaskbar = win32gui.FindWindow("Shell_TrayWnd", None)
-            m_hbar = win32gui.FindWindowEx(m_htaskbar, 0, "ReBarWindow32", None)
-            m_hmin = win32gui.FindWindowEx(m_hbar, 0, "MSTaskSwWClass", None)
-            win32gui.MoveWindow(m_hmin, 0, 0, b[2] - b[0] - d1_Window_width - d1_shiftx, b[3] - b[1],
-                                True)  # 将MSTaskSwWClass缩小[x位置，y位置，宽，高]，预留窗口位置
-
-            print('程序运行时间:' + str(runtime) + '秒')
-        except Exception as err3:
-            print('程序运行时间:' + str(runtime) + '秒\n' + str(err3))
-        runtime = runtime + 60
-        self.after(60000, self.windows2)
+        Button(movewindow, text="关闭", font=('微软雅黑', 10, 'bold'), activeforeground='#0080FF', command=Close).pack(pady=5)
 
 
 # 保存当前配置
@@ -478,10 +504,13 @@ def save():
 
 # 退出函数，还原之前的状态栏窗口大小
 def app_quit():
-    win32gui.MoveWindow(win32gui.FindWindowEx(win32gui.FindWindowEx(win32gui.FindWindow(
-        "Shell_TrayWnd", None), 0, "ReBarWindow32", None), 0, "MSTaskSwWClass", None),
-        0, 0, b[2] - b[0] - d1_shiftx, b[3] - b[1], True)  # 还原任务栏
-    sys.exit()
+    if sys.getwindowsversion().build >= 22000:
+        sys.exit()
+    else:
+        # 还原任务栏
+        win32gui.MoveWindow(win32gui.FindWindowEx(win32gui.FindWindowEx(win32gui.FindWindow(
+            "Shell_TrayWnd", None), 0, "ReBarWindow32", None), 0, "MSTaskSwWClass", None), 0, 0, b[2]-b[0], b[3]-b[1], True)
+        sys.exit()
 
 
 # 定义一个读取相对路径的函数
@@ -501,7 +530,7 @@ def about():
     root2.iconbitmap(resource_path(r'resources\images\logo.ico'))  # 设置图标，没有图片会报错
 
     curwidth = 900
-    curhight = 750
+    curhight = 760
     scn_w, scn_h = root2.maxsize()
     cen_x = (scn_w - curwidth) / 2
     cen_y = (scn_h - curhight) / 2
@@ -522,7 +551,7 @@ def about():
              "1Kk4f7QDKTGhLgUgDzZhgidUJzFYJdoHgL\n\n"
              "ETC地址 \n"
              "0xaeefdfd30472d096d23f3a809d3d6bfe95ead0d4\n\n"
-             "微信和支付宝二维码(推荐) \n" % str(runtime - 60))
+             "微信和支付宝二维码(推荐) \n" % str(runtime))
     t.tag_add("l", "1.0", "end")
     t.tag_config("l", justify="center")
     t.tag_add("link", "6.23", "6.69")
@@ -654,7 +683,7 @@ def zcm():
         l1 = Label(root, text="获取此软件更新请关注微信公众号：MD野生科技", font=('微软雅黑', 15, 'bold'), padx=0, pady=20, width=0, height=0, bg='white')
         photo = PhotoImage(file=resource_path(r'resources\images\MD_logo.gif'))
         p1 = Label(root, image=photo, width=200, height=200, bg='white')
-        l2 = Label(root, text="请在下方文本框中手动输入：MD野生科技", font=('微软雅黑', 14), padx=0, pady=10, width=0, height=0, bg='white')
+        l2 = Label(root, text="请在下方文本框中手动输入：MD野生科技", font=('微软雅黑', 14), padx=0, pady=10, width=0, height=0, foreground='red', bg='white')
         f1 = Frame(root, bg='white')
         l3 = Label(f1, text="验证口令:", font=('微软雅黑', 15), padx=0, pady=0, borderwidth=0, width=0, height=0, bg='white')
         e1 = Entry(f1, font=('微软雅黑', 15), bg='white')
@@ -709,7 +738,7 @@ if __name__ == '__main__':
         messagebox.showinfo("打开失败", "程序已启动，请关闭或检查当前已启动的程序")
         sys.exit()
     # 初始化变量
-    version = "InfobarTool_v1.0.6"
+    version = "InfobarTool_v1.0.7"
     code_jm = "MD野生科技"
     code_pd = linecache.getline(resource_path("register.ini"), 1).strip('\n')
     linecache.clearcache()
